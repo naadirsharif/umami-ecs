@@ -1,13 +1,13 @@
-.git
-docker-compose.yml
-Dockerfile
-.gitignore
-.DS_Store
-node_modules
-.idea
+# Node modules
+node_modules/
+
+# Next.js build
+.next/
+
+# dotenv files with secrets
 .env
 .env.*
-scripts/seed
-scripts/seed-data.ts
-generated
-.server.js
+
+# OS / IDE files
+.DS_Store
+.idea/
