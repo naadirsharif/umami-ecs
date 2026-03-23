@@ -6,7 +6,7 @@ FROM node:18-bullseye AS builder
 WORKDIR /app
 # Copy Node App dependencies 
 COPY /app/package*.json /app/pnpm-lock.yaml ./
-# Install dependencies / creates node_modules
+# Install dependencies / creates node modules
 RUN npm install -g pnpm
 RUN pnpm install 
 # Copy source code
@@ -20,21 +20,19 @@ RUN pnpm build
 # Stage 2: Production 
 
 # Lightweight image for production 
-FROM node:18-alpine 
+FROM node:18-alpine AS runner
 # Set destination for copy
 WORKDIR /app
-# Install pnpm
-RUN npm install -g pnpm
 # Copy all dependencies
-COPY --from=builder /app/package.json ./
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./
+# Copy Next.js standalone build (to run app)
 COPY --from=builder /app/.next/standalone ./
-# Copy source code
+# Copy app code
 COPY --from=builder /app/src ./src
-
 # Set permissions for node user
 RUN chown -R node:node /app
 
@@ -42,4 +40,7 @@ USER node
 
 EXPOSE 3000
 
-CMD ["pnpm", "start-docker"]
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+
+CMD ["node", "server.js"]
