@@ -1,13 +1,7 @@
-# Node modules
 node_modules/
-
-# Next.js build
 .next/
-
-# dotenv files with secrets
 .env
 .env.*
-
-# OS / IDE files
 .DS_Store
 .idea/
+.git/
