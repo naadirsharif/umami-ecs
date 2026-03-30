@@ -5,15 +5,16 @@ terraform {
       version = "~> 6.0"
     }
   }
-}
 
 # Configure backend and state locking
-backend "s3" {
+  backend "s3" {
     bucket         = "umami-terraform-state"   
     key            = "terraform.tfstate"       
     region         = "eu-central-1"           
     dynamodb_table = "terraform-state-lock"   
     encrypt        = true                      
+  }
+}
 
 # Configure the AWS Provider
 provider "aws" {
