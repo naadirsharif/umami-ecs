@@ -58,3 +58,47 @@ variable "nat_connectivity_type" {
 
 # ALB variables
 
+variable "alb_name" {
+    description = "name of main ALB"
+    type        = string
+    default     = "main-alb-tf"
+}
+
+variable "alb_type" {
+    description = "Type of ALB"
+    type        = string
+    default     = "application"
+}
+
+variable "target_group" {
+    description = "Name of Target Group"
+    type        = string
+    default     = "ecs-tg"
+}
+
+variable "tg_port" {
+    description = "port on which container listens"
+    type        = string
+    default     = "3000"
+}
+
+variable "health_path" {
+    description = "The http path the alb uses to check if container is healthy"
+    type        = string
+}
+
+variable "ssl_policy" {
+    description = "Policy of SSL"
+    type        = string
+    default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+}
+
+
+## ACM
+
+variable "domain_name" {  
+    description = "name of domain"
+    type        = string
+    default     = "nashar.dev"
+}
+    

@@ -24,7 +24,7 @@ resource "aws_subnet" "public-eu-central-1b" {
 
 resource "aws_subnet" "public-eu-central-1c" {
   vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[1]
+  availability_zone = var.availability_zones[2]
   cidr_block        = var.cidrs_public_subnet[2]
   tags              = var.tags
 }
@@ -120,4 +120,99 @@ resource "aws_route_table_association" "private_eu_central_1c" {
 
 # ALB configs
 
+resource "aws_lb" "main" {
+  name               = var.alb_name
+  internal           = false
+  load_balancer_type = var.alb_type
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = [
+    aws_subnet.public-eu-central-1a.id,
+    aws_subnet.public-eu-central-1b.id,
+    aws_subnet.public-eu-central-1c.id
+  ]
+  enable_deletion_protection = true
+
+  tags = var.tags
+}
+
+## Target group
+resource "aws_lb_target_group" "ecs_tg" {
+  name        = var.target_group
+  port        = var.tg_port
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.umami-vpc.id
+
+  health_check {
+    healthy_threshold   = "3"
+    interval            = "30"
+    protocol            = "HTTP"
+    timeout             = "30"
+    unhealthy_threshold = "2"
+    path                = var.health_path
+  }
+  tags = var.tags
+}
+
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "80"
+  protocol          = "HTTP"
+  
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+  tags = var.tags
+}
+
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = var.ssl_policy
+  certificate_arn   = aws_acm_certificate.cert.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ecs_tg.arn
+  }
+  tags = var.tags
+}
+
+
+
+# ACM
+
+resource "aws_acm_certificate" "cert" {
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  tags = var.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+
+
+
+# Security Groups
+
+## ALB SG's
+resource "aws_security_group" "alb_sg" {
+  name        = "alb_sg"
+  description = "Allow HTTP/HTTPS traffic"
+  vpc_id      = aws_vpc.umami-vpc.id
+
+  tags = var.tags
+}
 
