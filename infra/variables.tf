@@ -94,11 +94,35 @@ variable "ssl_policy" {
 }
 
 
-## ACM
+# SG variables
+
+variable "sg_name_alb" {
+  description = "name of the security group of the alb"
+  type        = string
+  default     = "alb_sg"
+}
+
+variable "alb_sg_description" {
+    description = "description for the security group of the alb"
+    type        = string
+}
+
+
+# ACM variables
 
 variable "domain_name" {  
     description = "name of domain"
     type        = string
-    default     = "nashar.dev"
 }
-    
+
+variable "acm_validation_method" {
+    description = "validation method of ACM"
+    type        = string
+}
+
+# ECR variables
+
+variable "ecr_name" {
+    type    = string
+    default = "umami-deployment"
+}

@@ -54,3 +54,20 @@ output "https_listener_arn" {
     description = "ARN of the https listener"
     value       = aws_lb_listener.https.arn
 }
+
+# ACM Outpus
+
+
+
+
+
+# ECR Outputs
+output "repo_arn" {
+    description = "ARN of the repository"
+    value       = aws_ecr_repository.app_repo.arn
+}
+
+output "repo_url" {
+    description = "Url of the repository"
+    value       = aws_ecr_repository.app_repo.repository_url
+}

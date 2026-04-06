@@ -154,7 +154,7 @@ resource "aws_lb_target_group" "ecs_tg" {
   tags = var.tags
 }
 
-
+## ALB Listener 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = "80"
@@ -188,11 +188,11 @@ resource "aws_lb_listener" "https" {
 
 
 
-# ACM
+# ACM configs
 
 resource "aws_acm_certificate" "cert" {
   domain_name       = var.domain_name
-  validation_method = "DNS"
+  validation_method = var.acm_validation_method
 
   tags = var.tags
 
@@ -205,14 +205,27 @@ resource "aws_acm_certificate" "cert" {
 
 
 
-# Security Groups
+# Security Groups configs
 
 ## ALB SG's
 resource "aws_security_group" "alb_sg" {
-  name        = "alb_sg"
-  description = "Allow HTTP/HTTPS traffic"
+  name        = var.sg_name_alb
+  description = var.alb_sg_description
   vpc_id      = aws_vpc.umami-vpc.id
 
   tags = var.tags
 }
 
+
+# ECR configs 
+resource "aws_ecr_repository" "app_repo" {
+  name                 = var.ecr_name
+  image_tag_mutability = "IMMUTABLE"
+
+  force_delete = false
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+  tags = var.tags
+}
