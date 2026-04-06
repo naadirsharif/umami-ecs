@@ -207,12 +207,54 @@ resource "aws_acm_certificate" "cert" {
 
 # Security Groups configs
 
-## ALB SG's
+## ALB SG
 resource "aws_security_group" "alb_sg" {
   name        = var.sg_name_alb
   description = var.alb_sg_description
   vpc_id      = aws_vpc.umami-vpc.id
 
+    ingress {
+    protocol  = "tcp"
+    from_port = 80
+    to_port   = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  } # -> Allow HTTP
+
+  ingress {
+    protocol  = "tcp"
+    from_port = 443
+    to_port   = 443
+    cidr_blocks = ["0.0.0.0/0"]
+  } # -> Allow HTTPS
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  tags = var.tags
+}
+
+## ECS SG -> Only from ALB 
+resource "aws_security_group" "ecs_sg" {
+  name        = var.sg_name_alb
+  description = var.alb_sg_description
+  vpc_id      = aws_vpc.umami-vpc.id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = var.container_port
+    to_port         = var.container_port
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+   egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
   tags = var.tags
 }
 
@@ -228,4 +270,155 @@ resource "aws_ecr_repository" "app_repo" {
     scan_on_push = true
   }
   tags = var.tags
+}
+
+
+# ECS Configs
+
+
+## Cluster
+resource "aws_ecs_cluster" "main" {
+  name = var.cluster_name
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+}
+
+## Log group
+resource "aws_cloudwatch_log_group" "main" {
+  name = "umami-logs"
+}
+
+## Task definition 
+resource "aws_ecs_task_definition" "main" {
+  family                   = "umami-task"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = 1024
+  memory                   = 2048
+
+  # Dummy image for Terraform bootstrap -> will be overwritten later by CI/CD
+container_definitions = <<TASK_DEFINITION
+[
+  {
+    "name": "umami-ecs",
+    "image": "amazonlinux:2", 
+    "cpu": 1024,
+    "memory": 2048,
+    "essential": true,
+    "environment": [
+      {"name": "HOST", "value": "0.0.0.0"}
+    ],
+    "secrets": [
+      {
+        "name": "DATABASE_URL",
+        "valueFrom": "${aws_ssm_parameter.db_connection_string.arn}"
+      }
+    ],
+    "portMappings": [
+      {
+        "containerPort": 3000,
+        "hostPort": 3000,
+        "protocol": "tcp"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${aws_cloudwatch_log_group.main.name}",
+        "awslogs-region": "eu-central-1",
+        "awslogs-stream-prefix": "umami-logs"
+      }
+    }
+  }
+]
+TASK_DEFINITION
+
+
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
+  }
+  tags = var.tags
+}
+
+
+## SSM Paramater -> connect with database
+
+resource "aws_ssm_parameter" "db_connection_string" {
+  name  = "/umami/db/connection_string"
+  type  = "SecureString"
+  value = var.db_string
+  tags  = var.tags
+}
+
+
+## Service 
+resource "aws_ecs_service" "main" {
+  name            = "umami"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.main.arn
+  desired_count   = 3
+  iam_role        = aws_iam_role.ecs_iam.arn
+  depends_on      = [
+    aws_iam_role_policy_attachment.cw_logs,
+    aws_iam_role_policy_attachment.ecr_pull
+    ]
+
+  network_configuration {
+    subnets = [ 
+      aws_subnet.private-eu-central-1a.id,
+      aws_subnet.private-eu-central-1b.id,
+      aws_subnet.private-eu-central-1c.id
+     ]
+
+    assign_public_ip = false
+    security_groups = [aws_security_group.ecs_sg.id]
+  }
+
+  load_balancer {
+    container_name = "umami-ecs"
+    container_port = var.container_port
+    target_group_arn = aws_lb_target_group.ecs_tg.arn
+  }
+tags = var.tags
+}
+
+
+
+# ECS IAM 
+
+resource "aws_iam_role" "ecs_iam" {
+  name = var.ecs_iam_name
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      },
+    ]
+  })
+  tags = var.tags
+}
+
+## Policy Attachment 
+
+# ECR Pull
+resource "aws_iam_role_policy_attachment" "ecr_pull" {
+  role       = aws_iam_role.ecs_iam.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+# CloudWatch Logs
+resource "aws_iam_role_policy_attachment" "cw_logs" {
+  role       = aws_iam_role.ecs_iam.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }

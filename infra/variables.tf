@@ -78,8 +78,8 @@ variable "target_group" {
 
 variable "tg_port" {
     description = "port on which container listens"
-    type        = string
-    default     = "3000"
+    type        = number
+    default     = 3000
 }
 
 variable "health_path" {
@@ -97,14 +97,33 @@ variable "ssl_policy" {
 # SG variables
 
 variable "sg_name_alb" {
-  description = "name of the security group of the alb"
-  type        = string
-  default     = "alb_sg"
+    description = "name of the security group of the alb"
+    type        = string
+    default     = "alb_sg"
 }
 
 variable "alb_sg_description" {
     description = "description for the security group of the alb"
     type        = string
+    default     = "Allow HTTP/HTTPS traffic"
+}
+
+variable "sg_name_ecs" {
+    description = "name of the security group for ecs"
+    type        = string
+    default     = "value"
+}
+
+variable "ecs_sg_description" {
+    description = "description for the security group of ecs"
+    type        = string
+    default     = "Allow only from ALB"
+}
+
+variable "container_port" {
+    description = "internal port of container"
+    type        = number
+    default     = "3000"
 }
 
 
@@ -125,4 +144,28 @@ variable "acm_validation_method" {
 variable "ecr_name" {
     type    = string
     default = "umami-deployment"
+}
+
+
+
+# ECS variables
+
+variable "cluster_name" {
+    type = string
+    description = "name of ecs cluster"
+    default = "umami-cluster"
+}
+
+variable "db_string" {
+    description = "connection string of databse"
+    type        = string
+    sensitive   = true
+}
+
+
+# IAM
+
+variable "ecs_iam_name" {
+    type = string
+    default = "ecs_role"
 }
