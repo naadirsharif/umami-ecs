@@ -1,9 +1,8 @@
-# VPC outputs
-
 output "vpc_id" {
     description = "ID of the VPC"
     value = aws_vpc.umami-vpc.id
 }
+
 
 output "public_subnet_ids" {
   description = "ID of all public subnets"

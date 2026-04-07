@@ -1,4 +1,6 @@
-# VPC Variables 
+#################################################################
+
+# General Variables
 
 variable "tags" {
   type = map(string)
@@ -8,11 +10,9 @@ variable "tags" {
   }
 }
 
-variable "aws_region" {
-    description = "AWS region"
-    type        = string
-    default     = "eu-central-1"
-}
+#################################################################
+
+# VPC Variables 
 
 variable "availability_zones" {
     description = "availability zones 1a-1c"
@@ -50,11 +50,7 @@ variable "cidrs_private_subnet" {
     ]
 }
 
-variable "nat_connectivity_type" {  
-    description = "Connectivity type of the NAT gateway"
-    type        = string
-    default     = "public"
-}
+#################################################################
 
 # ALB variables
 
@@ -93,9 +89,7 @@ variable "ssl_policy" {
     default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 }
 
-
-# SG variables
-
+# ALB SG
 variable "sg_name_alb" {
     description = "name of the security group of the alb"
     type        = string
@@ -108,45 +102,7 @@ variable "alb_sg_description" {
     default     = "Allow HTTP/HTTPS traffic"
 }
 
-variable "sg_name_ecs" {
-    description = "name of the security group for ecs"
-    type        = string
-    default     = "value"
-}
-
-variable "ecs_sg_description" {
-    description = "description for the security group of ecs"
-    type        = string
-    default     = "Allow only from ALB"
-}
-
-variable "container_port" {
-    description = "internal port of container"
-    type        = number
-    default     = "3000"
-}
-
-
-# ACM variables
-
-variable "domain_name" {  
-    description = "name of domain"
-    type        = string
-}
-
-variable "acm_validation_method" {
-    description = "validation method of ACM"
-    type        = string
-}
-
-# ECR variables
-
-variable "ecr_name" {
-    type    = string
-    default = "umami-deployment"
-}
-
-
+#################################################################
 
 # ECS variables
 
@@ -162,8 +118,51 @@ variable "db_string" {
     sensitive   = true
 }
 
+# ECS SG
+variable "sg_name_ecs" {
+    description = "name of the security group for ecs"
+    type        = string
+    default     = "ecs_sg"
+}
 
-# IAM
+variable "ecs_sg_description" {
+    description = "description for the security group of ecs"
+    type        = string
+    default     = "Allow only from ALB"
+}
+
+variable "container_port" {
+    description = "internal port of container"
+    type        = number
+    default     = "3000"
+}
+
+#################################################################
+
+# ACM variables
+
+variable "domain_name" {  
+    description = "name of domain"
+    type        = string
+}
+
+variable "acm_validation_method" {
+    description = "validation method of ACM"
+    type        = string
+}
+
+#################################################################
+
+# ECR variables
+
+variable "ecr_name" {
+    type    = string
+    default = "umami-deployment"
+}
+
+#################################################################
+
+# IAM Variables
 
 variable "ecs_iam_name" {
     type = string

@@ -1,424 +1,45 @@
-# VPC configs
-
-## Create VPC
-resource "aws_vpc" "umami-vpc" {
-  cidr_block = var.cidr_vpc
-  region = var.aws_region
-  tags = var.tags
+module "vpc" {
+  source               = "./modules/vpc"
+  tags                 = var.tags
+  availability_zones   = var.availability_zones
+  cidr_vpc             = var.cidr_vpc
+  cidrs_public_subnet  = var.cidrs_public_subnet
+  cidrs_private_subnet = var.cidrs_private_subnet
 }
 
-## Public Subnets
-resource "aws_subnet" "public-eu-central-1a" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[0]
-  cidr_block        = var.cidrs_public_subnet[0]
-  tags              = var.tags
+module "alb" {
+  source          = "./modules/alb"
+  tags            = var.tags
+  tg_port         = var.tg_port
+  health_path     = var.health_path
+  vpc_id          = module.vpc.vpc_id
+  public_subnets  = module.vpc.public_subnet_ids
+  cert_arn        = module.acm.certificate_arn
+  sg_name_alb     = var.sg_name_alb
+  alb_sg_description = var.alb_sg_description
 }
 
-resource "aws_subnet" "public-eu-central-1b" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[1]
-  cidr_block        = var.cidrs_public_subnet[1]
-  tags              = var.tags
+module "acm" {
+  source      = "./modules/acm"
+  tags        = var.tags
+  domain_name = var.domain_name
+  acm_validation_method = var.acm_validation_method
 }
 
-resource "aws_subnet" "public-eu-central-1c" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[2]
-  cidr_block        = var.cidrs_public_subnet[2]
-  tags              = var.tags
+module "ecs" {
+  source               = "./modules/ecs"
+  tags                 = var.tags
+  alb_sg_id            = module.alb.alb_sg_id
+  vpc_id               = module.vpc.vpc_id
+  private_subnet_ids   = module.vpc.private_subnet_ids
+  cluster_name         = var.cluster_name
+  db_string            = var.db_string
+  tg_arn               = module.alb.ecs_target_group_arn
 }
 
-## Private Subnets
-resource "aws_subnet" "private-eu-central-1a" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[0]
-  cidr_block        = var.cidrs_private_subnet[0]
-  tags              = var.tags
+module "ecr" {
+  source   = "./modules/ecr"
+  tags     = var.tags
+  ecr_name = var.ecr_name
 }
 
-resource "aws_subnet" "private-eu-central-1b" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[1]
-  cidr_block        = var.cidrs_private_subnet[1]
-  tags              = var.tags
-}
-
-resource "aws_subnet" "private-eu-central-1c" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[2]
-  cidr_block        = var.cidrs_private_subnet[2]
-  tags              = var.tags
-}
-
-## IGW and NGW
-resource "aws_internet_gateway" "umami-igw" {
-  vpc_id = aws_vpc.umami-vpc.id
-  region = var.aws_region
-  tags   = var.tags
-}
-
-resource "aws_nat_gateway" "umami-nat" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  connectivity_type = var.nat_connectivity_type
-  tags              = var.tags
-}
-
-## Public Route Table
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.umami-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.umami-igw.id
-  }
-  tags = var.tags
-}
-
-## Public Route Table Assocications
-resource "aws_route_table_association" "public_eu_central_1a" {
-  subnet_id      = aws_subnet.public-eu-central-1a.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "public_eu_central_1b" {
-  subnet_id      = aws_subnet.public-eu-central-1b.id
-  route_table_id = aws_route_table.public.id
-}
-resource "aws_route_table_association" "public_eu_central_1c" {
-  subnet_id      = aws_subnet.public-eu-central-1c.id
-  route_table_id = aws_route_table.public.id
-}
-
-## Private Route Table
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.umami-vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.umami-nat.id
-  }
-  tags           = var.tags
-}
-
-## Private Route Table Assocications
-resource "aws_route_table_association" "private_eu_central_1a" {
-  subnet_id      = aws_subnet.private-eu-central-1a.id
-  route_table_id = aws_route_table.private.id
-}
-
-resource "aws_route_table_association" "private_eu_central_1b" {
-  subnet_id      = aws_subnet.private-eu-central-1b.id
-  route_table_id = aws_route_table.private.id
-}
-resource "aws_route_table_association" "private_eu_central_1c" {
-  subnet_id      = aws_subnet.private-eu-central-1c.id
-  route_table_id = aws_route_table.private.id
-}
-
-
-
-# ALB configs
-
-resource "aws_lb" "main" {
-  name               = var.alb_name
-  internal           = false
-  load_balancer_type = var.alb_type
-  security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = [
-    aws_subnet.public-eu-central-1a.id,
-    aws_subnet.public-eu-central-1b.id,
-    aws_subnet.public-eu-central-1c.id
-  ]
-  enable_deletion_protection = true
-
-  tags = var.tags
-}
-
-## Target group
-resource "aws_lb_target_group" "ecs_tg" {
-  name        = var.target_group
-  port        = var.tg_port
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = aws_vpc.umami-vpc.id
-
-  health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "HTTP"
-    timeout             = "30"
-    unhealthy_threshold = "2"
-    path                = var.health_path
-  }
-  tags = var.tags
-}
-
-## ALB Listener 
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.main.arn
-  port              = "80"
-  protocol          = "HTTP"
-  
-  default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-  tags = var.tags
-}
-
-resource "aws_lb_listener" "https" {
-  load_balancer_arn = aws_lb.main.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = var.ssl_policy
-  certificate_arn   = aws_acm_certificate.cert.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ecs_tg.arn
-  }
-  tags = var.tags
-}
-
-
-
-# ACM configs
-
-resource "aws_acm_certificate" "cert" {
-  domain_name       = var.domain_name
-  validation_method = var.acm_validation_method
-
-  tags = var.tags
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-
-
-
-
-# Security Groups configs
-
-## ALB SG
-resource "aws_security_group" "alb_sg" {
-  name        = var.sg_name_alb
-  description = var.alb_sg_description
-  vpc_id      = aws_vpc.umami-vpc.id
-
-    ingress {
-    protocol  = "tcp"
-    from_port = 80
-    to_port   = 80
-    cidr_blocks = ["0.0.0.0/0"]
-  } # -> Allow HTTP
-
-  ingress {
-    protocol  = "tcp"
-    from_port = 443
-    to_port   = 443
-    cidr_blocks = ["0.0.0.0/0"]
-  } # -> Allow HTTPS
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-  tags = var.tags
-}
-
-## ECS SG -> Only from ALB 
-resource "aws_security_group" "ecs_sg" {
-  name        = var.sg_name_alb
-  description = var.alb_sg_description
-  vpc_id      = aws_vpc.umami-vpc.id
-
-  ingress {
-    protocol        = "tcp"
-    from_port       = var.container_port
-    to_port         = var.container_port
-    security_groups = [aws_security_group.alb_sg.id]
-  }
-
-   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-  tags = var.tags
-}
-
-
-# ECR configs 
-resource "aws_ecr_repository" "app_repo" {
-  name                 = var.ecr_name
-  image_tag_mutability = "IMMUTABLE"
-
-  force_delete = false
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-  tags = var.tags
-}
-
-
-# ECS Configs
-
-
-## Cluster
-resource "aws_ecs_cluster" "main" {
-  name = var.cluster_name
-
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
-  }
-}
-
-## Log group
-resource "aws_cloudwatch_log_group" "main" {
-  name = "umami-logs"
-}
-
-## Task definition 
-resource "aws_ecs_task_definition" "main" {
-  family                   = "umami-task"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
-  cpu                      = 1024
-  memory                   = 2048
-
-  # Dummy image for Terraform bootstrap -> will be overwritten later by CI/CD
-container_definitions = <<TASK_DEFINITION
-[
-  {
-    "name": "umami-ecs",
-    "image": "amazonlinux:2", 
-    "cpu": 1024,
-    "memory": 2048,
-    "essential": true,
-    "environment": [
-      {"name": "HOST", "value": "0.0.0.0"}
-    ],
-    "secrets": [
-      {
-        "name": "DATABASE_URL",
-        "valueFrom": "${aws_ssm_parameter.db_connection_string.arn}"
-      }
-    ],
-    "portMappings": [
-      {
-        "containerPort": 3000,
-        "hostPort": 3000,
-        "protocol": "tcp"
-      }
-    ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "${aws_cloudwatch_log_group.main.name}",
-        "awslogs-region": "eu-central-1",
-        "awslogs-stream-prefix": "umami-logs"
-      }
-    }
-  }
-]
-TASK_DEFINITION
-
-
-  runtime_platform {
-    operating_system_family = "LINUX"
-    cpu_architecture        = "X86_64"
-  }
-  tags = var.tags
-}
-
-
-## SSM Paramater -> connect with database
-
-resource "aws_ssm_parameter" "db_connection_string" {
-  name  = "/umami/db/connection_string"
-  type  = "SecureString"
-  value = var.db_string
-  tags  = var.tags
-}
-
-
-## Service 
-resource "aws_ecs_service" "main" {
-  name            = "umami"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.main.arn
-  desired_count   = 3
-  iam_role        = aws_iam_role.ecs_iam.arn
-  depends_on      = [
-    aws_iam_role_policy_attachment.cw_logs,
-    aws_iam_role_policy_attachment.ecr_pull
-    ]
-
-  network_configuration {
-    subnets = [ 
-      aws_subnet.private-eu-central-1a.id,
-      aws_subnet.private-eu-central-1b.id,
-      aws_subnet.private-eu-central-1c.id
-     ]
-
-    assign_public_ip = false
-    security_groups = [aws_security_group.ecs_sg.id]
-  }
-
-  load_balancer {
-    container_name = "umami-ecs"
-    container_port = var.container_port
-    target_group_arn = aws_lb_target_group.ecs_tg.arn
-  }
-tags = var.tags
-}
-
-
-
-# ECS IAM 
-
-resource "aws_iam_role" "ecs_iam" {
-  name = var.ecs_iam_name
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      },
-    ]
-  })
-  tags = var.tags
-}
-
-## Policy Attachment 
-
-# ECR Pull
-resource "aws_iam_role_policy_attachment" "ecr_pull" {
-  role       = aws_iam_role.ecs_iam.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-}
-
-# CloudWatch Logs
-resource "aws_iam_role_policy_attachment" "cw_logs" {
-  role       = aws_iam_role.ecs_iam.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
-}

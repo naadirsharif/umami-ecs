@@ -1,9 +1,8 @@
-# VPC configs
+# VPC module: VPC, subnets, IGW & NAT, routing
 
-## Create VPC
+## VPC
 resource "aws_vpc" "umami-vpc" {
   cidr_block = var.cidr_vpc
-  region = var.aws_region
   tags = var.tags
 }
 
@@ -54,7 +53,6 @@ resource "aws_subnet" "private-eu-central-1c" {
 ## IGW and NGW
 resource "aws_internet_gateway" "umami-igw" {
   vpc_id = aws_vpc.umami-vpc.id
-  region = var.aws_region
   tags   = var.tags
 }
 
