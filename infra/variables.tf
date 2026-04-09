@@ -175,3 +175,8 @@ variable "ecs_iam_name" {
 variable "cloudflare_api_token" {
     sensitive = true
 }
+
+variable "zone_id_cloudflare" {
+    type = string
+}
+

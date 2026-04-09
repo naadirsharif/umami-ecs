@@ -43,3 +43,10 @@ module "ecr" {
   ecr_name = var.ecr_name
 }
 
+module "cloudflare" {
+  source = "./modules/cloudflare"
+  domain_name = var.domain_name
+  alb_dns = module.alb.alb_dns_name
+  zone_id = var.zone_id_cloudflare
+}
+
