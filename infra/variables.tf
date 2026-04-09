@@ -114,7 +114,6 @@ variable "cluster_name" {
 
 variable "db_string" {
     description = "connection string of databse"
-    type        = string
     sensitive   = true
 }
 
@@ -134,7 +133,7 @@ variable "ecs_sg_description" {
 variable "container_port" {
     description = "internal port of container"
     type        = number
-    default     = "3000"
+    default     = 3000
 }
 
 #################################################################

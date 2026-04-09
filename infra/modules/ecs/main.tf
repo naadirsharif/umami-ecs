@@ -1,4 +1,4 @@
-# ECS Configs
+# ECS module: creates cluster, task definition, service, IAM, SG and SSM parameter
 
 
 ## Cluster
@@ -13,7 +13,7 @@ resource "aws_ecs_cluster" "main" {
 
 ## Log group
 resource "aws_cloudwatch_log_group" "main" {
-  name = "umami-logs"
+  name = "${var.cluster_name}-logs"
 }
 
 ## Task definition 

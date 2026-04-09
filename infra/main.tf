@@ -29,10 +29,10 @@ module "acm" {
 module "ecs" {
   source               = "./modules/ecs"
   tags                 = var.tags
+  cluster_name         = var.cluster_name
   alb_sg_id            = module.alb.alb_sg_id
   vpc_id               = module.vpc.vpc_id
   private_subnet_ids   = module.vpc.private_subnet_ids
-  cluster_name         = var.cluster_name
   db_string            = var.db_string
   tg_arn               = module.alb.ecs_target_group_arn
 }

@@ -40,7 +40,7 @@ variable "ecs_sg_description" {
 variable "container_port" {
     description = "internal port of container"
     type        = number
-    default     = "3000"
+    default     = 3000
 }
 
 variable "tg_arn" {
