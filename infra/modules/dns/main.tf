@@ -18,4 +18,3 @@ resource "cloudflare_dns_record" "alb_dns_record" {
   proxied = false
 }
 
-# ACM Validation 
