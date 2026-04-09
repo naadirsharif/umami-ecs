@@ -4,9 +4,13 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.0"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5"
+    }
   }
 
-# Configure backend and state locking
+  # Configure backend and state locking
   backend "s3" {
     bucket         = "umami-terraform-state-530193444530-eu-central-1-an"   
     key            = "terraform.tfstate"       
@@ -19,4 +23,8 @@ terraform {
 # Configure the AWS Provider
 provider "aws" {
   region = "eu-central-1"
+}
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
 }

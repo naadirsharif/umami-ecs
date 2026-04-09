@@ -167,3 +167,11 @@ variable "ecs_iam_name" {
     type = string
     default = "ecs_role"
 }
+
+#################################################################
+
+# Cloudflare
+
+variable "cloudflare_api_token" {
+    sensitive = true
+}
