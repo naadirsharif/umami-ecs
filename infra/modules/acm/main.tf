@@ -24,7 +24,7 @@ terraform {
   }
 }
 
-## Validation Record
+## Cloudflare Validation Record
 resource "cloudflare_dns_record" "cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => dvo
@@ -36,13 +36,14 @@ resource "cloudflare_dns_record" "cert_validation" {
   content = each.value.resource_record_value
   ttl     = 1
   proxied = false
-}
+} 
 
-## Validate!
+## ACM Validation
 resource "aws_acm_certificate_validation" "cert_validation" {
-  certificate_arn         = aws_acm_certificate.cert.arn
-   validation_record_fqdns = [
-    for record in cloudflare_dns_record.cert_validation :
-    "${record.name}.${var.domain_name}"
-   ]
+  certificate_arn = aws_acm_certificate.cert.arn
+
+  validation_record_fqdns = [
+    for dvo in aws_acm_certificate.cert.domain_validation_options :
+    dvo.resource_record_name
+  ]
 }
