@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "main" {
   cpu                      = 1024
   memory                   = 2048
 
-# Dummy image for Terraform bootstrap -> will be overwritten by CI/CD
+# Dummy image -> will be overwritten by CI/CD
 container_definitions = <<TASK_DEFINITION
 [
   {
