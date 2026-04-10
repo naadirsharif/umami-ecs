@@ -6,14 +6,24 @@ on:
     paths: 
       - "docker/**"
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  build:
+  build: 
     name: Build the image and deploy it to AWS ECR
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: ${{ secrets.OIDC_ARN }}
+          aws-region: eu-central-1
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -28,13 +38,13 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-         docker buildx build --platform linux/amd64 \
-          -t $PROJECT_NAME:$IMAGE_TAG \
-          -f docker/Dockerfile \
-         .
+          docker buildx build --platform linux/amd64 \
+            -t $PROJECT_NAME:$IMAGE_TAG \
+            -f docker/Dockerfile \
+          .
 
-         docker tag $PROJECT_NAME:$IMAGE_TAG \
-          $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
-        
-         docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
+          docker tag $PROJECT_NAME:$IMAGE_TAG \
+            $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
+          
+          docker push $ECR_REGISTRY/$REPO_NAME:$IMAGE_TAG
 
