@@ -30,6 +30,7 @@ module "acm" {
 module "ecs" {
   source               = "./modules/ecs"
   tags                 = var.tags
+  app_image            = var.app_image
   cluster_name         = var.cluster_name
   alb_sg_id            = module.alb.alb_sg_id
   vpc_id               = module.vpc.vpc_id

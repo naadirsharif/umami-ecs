@@ -117,6 +117,11 @@ variable "cluster_name" {
     default = "umami-cluster"
 }
 
+variable "app_image" {
+    description = "docker image"
+    type = string
+}
+
 variable "db_string" {
     description = "connection string of databse"
     sensitive   = true

@@ -29,7 +29,7 @@ container_definitions = <<TASK_DEFINITION
 [
   {
     "name": "umami-ecs",
-    "image": "amazonlinux:2", 
+    "image": "${var.app_image}", 
     "cpu": 1024,
     "memory": 2048,
     "essential": true,

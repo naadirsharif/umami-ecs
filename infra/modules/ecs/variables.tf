@@ -48,9 +48,15 @@ variable "tg_arn" {
     type        = string
 }
 
+variable "app_image" {
+    description = "docker image"
+    type = string
+}
+
 
 # IAM 
 variable "ecs_iam_name" {
     type = string
     default = "ecs_role"
 }
+
