@@ -20,11 +20,12 @@ terraform {
   }
 }
 
-# Configure the AWS Provider
+# Configure AWS Provider
 provider "aws" {
   region = "eu-central-1"
 }
 
+# Configure Cloudflare Provider
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
