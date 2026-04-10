@@ -22,7 +22,7 @@ terraform {
 
 # Configure AWS Provider
 provider "aws" {
-  region = "eu-central-1"
+  region = var.region
 }
 
 # Configure Cloudflare Provider
