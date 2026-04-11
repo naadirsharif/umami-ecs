@@ -1,6 +1,7 @@
 name: Build docker image and push it to AWS ECR with OIDC
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths: 
