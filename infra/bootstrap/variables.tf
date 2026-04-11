@@ -19,7 +19,19 @@ variable "region" {
 
 # ECR
 
-variable "ecr_name" {
+variable "ecr_repo_name" {
     description = "ECR Repo name"
     type    = string
+}
+
+#################################################################
+
+# OIDC
+
+variable "oidc_iam_name" {
+  default = "github-actions-role"
+}
+
+variable "github_repo" {
+    description = "github repository in the format 'owner/repo' that is allowed to assume iam role via GitHub Actions OIDC"
 }
