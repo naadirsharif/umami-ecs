@@ -45,7 +45,7 @@ resource "aws_iam_role_policy_attachment" "ecs" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }
 
-
+# Allows GitHub Actions to pass the ECS task role during deployment
 resource "aws_iam_role_policy" "passrole" {
   name = "github-actions-passrole"
   role = aws_iam_role.github_actions.id
