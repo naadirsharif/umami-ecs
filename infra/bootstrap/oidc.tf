@@ -61,3 +61,60 @@ resource "aws_iam_role_policy" "passrole" {
     ]
   })
 }
+
+# Allow GitHub Actions to access Terraform state stored in S3
+resource "aws_iam_policy" "terraform_state" {
+  name = "terraform-state-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.tf_state.arn,
+          "${aws_s3_bucket.tf_state.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_state_attach" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = aws_iam_policy.terraform_state.arn
+}
+
+
+
+resource "aws_iam_policy" "terraform_dynamodb_lock" {
+  name = "terraform-dynamodb-lock-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DescribeTable"
+        ]
+        Resource = aws_dynamodb_table.tf_lock.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_dynamodb_attach" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = aws_iam_policy.terraform_dynamodb_lock.arn
+}

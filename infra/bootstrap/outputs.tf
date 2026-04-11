@@ -8,3 +8,8 @@ output "oidc_arn" {
     value = aws_iam_role.github_actions.arn
 }
 
+output "s3_arn" {
+  description = "Bucket ARN"
+  value       = aws_s3_bucket.tf-state.arn
+}
+
