@@ -39,12 +39,6 @@ module "ecs" {
   tg_arn               = module.alb.ecs_target_group_arn
 }
 
-module "ecr" {
-  source   = "./modules/ecr"
-  tags     = var.tags
-  ecr_name = var.ecr_name
-}
-
 module "dns" {
   source = "./modules/dns"
   domain_name = var.domain_name
