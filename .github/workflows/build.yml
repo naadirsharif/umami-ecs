@@ -1,4 +1,4 @@
-name: build an push docker image push to AWS ECR with OIDC
+name: Build docker image and push it to AWS ECR with OIDC
 
 on:
   push:
