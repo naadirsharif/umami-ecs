@@ -91,8 +91,7 @@ resource "aws_iam_role_policy_attachment" "terraform_state_attach" {
   policy_arn = aws_iam_policy.terraform_state.arn
 }
 
-
-
+# Allow access to dynamodb state locking to prevent simultaneous Terraform operations.
 resource "aws_iam_policy" "terraform_dynamodb_lock" {
   name = "terraform-dynamodb-lock-access"
 
