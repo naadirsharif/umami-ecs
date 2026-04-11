@@ -2,6 +2,10 @@ variable "tags" {
   type = map(string)
 }
 
+variable "region" {
+  type = string
+}
+
 variable "cluster_name" {
     type = string
     description = "name of ecs cluster"

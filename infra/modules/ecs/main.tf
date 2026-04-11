@@ -53,7 +53,7 @@ container_definitions = <<TASK_DEFINITION
       "logDriver": "awslogs",
       "options": {
         "awslogs-group": "${aws_cloudwatch_log_group.main.name}",
-        "awslogs-region": "eu-central-1",
+        "awslogs-region": "${var.region}",
         "awslogs-stream-prefix": "umami-logs"
       }
     }
