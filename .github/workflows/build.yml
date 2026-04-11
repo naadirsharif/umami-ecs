@@ -11,6 +11,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
 jobs:
   build: 
     name: Build the image and deploy it to AWS ECR
@@ -24,7 +27,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
           role-to-assume: ${{ secrets.OIDC_ARN }}
-          aws-region: eu-central-1
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: login-ecr
