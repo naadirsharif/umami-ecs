@@ -28,6 +28,7 @@ module "acm" {
 }
 
 module "ecs" {
+  region               = var.region
   source               = "./modules/ecs"
   tags                 = var.tags
   app_image            = var.app_image
