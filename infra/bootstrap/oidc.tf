@@ -45,23 +45,6 @@ resource "aws_iam_role_policy_attachment" "ecs" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }
 
-# Allows GitHub Actions to pass the ECS task role during deployment
-resource "aws_iam_role_policy" "passrole" {
-  name = "github-actions-passrole"
-  role = aws_iam_role.github_actions.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "iam:PassRole"
-        Resource = aws_iam_role.ecs_iam.arn
-      }
-    ]
-  })
-}
-
 # Allow GitHub Actions to access Terraform state stored in S3
 resource "aws_iam_policy" "terraform_state" {
   name = "terraform-state-access"
@@ -116,4 +99,22 @@ resource "aws_iam_policy" "terraform_dynamodb_lock" {
 resource "aws_iam_role_policy_attachment" "terraform_dynamodb_attach" {
   role       = aws_iam_role.github_actions.name
   policy_arn = aws_iam_policy.terraform_dynamodb_lock.arn
+}
+
+
+# Allow GitHub Actions to pass the ECS task role during deployment
+resource "aws_iam_role_policy" "passrole" {
+  name = "github-actions-passrole"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "iam:PassRole"
+        Resource = "*"
+      }
+    ]
+  })
 }
