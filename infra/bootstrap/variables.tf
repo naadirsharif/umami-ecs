@@ -21,7 +21,8 @@ variable "region" {
 
 variable "ecr_repo_name" {
     description = "ECR Repo name"
-    type    = string
+    type        = string
+    default     = "umami-repo"
 }
 
 #################################################################
