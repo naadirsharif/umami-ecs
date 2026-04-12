@@ -1,11 +1,7 @@
-name: Build docker image and push it to AWS ECR with OIDC
+name: Build and apply Terraform infrastructure
 
-on:
+on: 
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: 
-      - "docker/**"
 
 permissions:
   id-token: write
@@ -15,10 +11,10 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION }}
 
 jobs:
-  build: 
-    name: Build the image and deploy it to AWS ECR
+  plan:
     runs-on: ubuntu-latest
-
+    name: Create a plan for the Terraform infrastructure
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,28 +25,28 @@ jobs:
           role-to-assume: ${{ secrets.OIDC_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
 
-      - name: Build Docker image
-        env:
-          GITHUB_SHA: ${{ github.sha }}
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
-        run: |
-          docker buildx build \
-          --platform linux/amd64 \
-          --build-arg DATABASE_URL="$DATABASE_URL" \
-          -f docker/Dockerfile \
-          -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}" \
-          .
-        
-      - name: Push Docker image to ECR
-        env:
-          GITHUB_SHA: ${{ github.sha }}
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-        run: |
-          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}"
+      - name: terraform fmt (lint code)
+        uses: dflook/terraform-fmt-check@v2
+        with:
+          path: infra/
+
+
+      - name: terraform validate
+        uses: dflook/terraform-validate@v2
+        with:
+          path: infra/
+
+
+      - name: terraform plan
+        uses: dflook/terraform-plan@v2
+        with:
+          path: infra/
+
+
+      - name: terraform apply
+        uses: dflook/terraform-apply@v2
+        with:
+          path: infra/
+          auto_approve: true
+
