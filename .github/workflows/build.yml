@@ -35,6 +35,7 @@ jobs:
 
       - name: Build Docker image
         env:
+          GITHUB_SHA: ${{ github.sha }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPO_NAME: ${{ vars.REPO_NAME }}
         run: |
@@ -46,6 +47,7 @@ jobs:
         
       - name: Push Docker image to ECR
         env:
+          GITHUB_SHA: ${{ github.sha }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPO_NAME: ${{ vars.REPO_NAME }}
         run: |
