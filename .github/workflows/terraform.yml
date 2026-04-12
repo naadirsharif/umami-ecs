@@ -1,0 +1,52 @@
+name: Terraform Pipeline
+
+on: 
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    name: Create a plan for the Terraform infrastructure
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: ${{ secrets.OIDC_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+
+      - name: terraform fmt (lint code)
+        uses: dflook/terraform-fmt-check@v2
+        with:
+          path: infra/
+
+
+      - name: terraform validate
+        uses: dflook/terraform-validate@v2
+        with:
+          path: infra/
+
+
+      - name: terraform plan
+        uses: dflook/terraform-plan@v2
+        with:
+          path: infra/
+
+
+      - name: terraform apply
+        uses: dflook/terraform-apply@v2
+        with:
+          path: infra/
+          auto_approve: true
+
