@@ -9,7 +9,6 @@ output "oidc_arn" {
 }
 
 output "s3_arn" {
-  description = "Bucket ARN"
-  value       = aws_s3_bucket.tf_state.arn
+  description = "Bucket name"
+  value       = aws_s3_bucket.tf_state.bucket
 }
-
