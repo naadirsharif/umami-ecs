@@ -41,9 +41,10 @@ jobs:
           REPO_NAME: ${{ vars.REPO_NAME }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
         run: |
-          docker buildx build --platform linux/amd64 \
+          docker buildx build \
+            --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
+            --platform linux/amd64 \
             -t $PROJECT_NAME:$IMAGE_TAG \
             -f docker/Dockerfile \
           .
