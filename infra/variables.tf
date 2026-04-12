@@ -190,10 +190,3 @@ variable "zone_id_cloudflare" {
     type = string
 }
 
-#################################################################
-
-# S3
-
-variable "bucket_name" {
-    type = string
-}
