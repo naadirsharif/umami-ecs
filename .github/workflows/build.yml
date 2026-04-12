@@ -1,4 +1,4 @@
-name: Build and apply Terraform infrastructure
+name: Build and Apply Terraform infrastructure
 
 on: 
   workflow_dispatch:
@@ -23,7 +23,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
           role-to-assume: ${{ secrets.OIDC_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
 
       - name: terraform fmt (lint code)
@@ -44,9 +44,26 @@ jobs:
           path: infra/
 
 
+  apply:
+    runs-on: ubuntu-latest
+    name: Terraform apply
+    needs: plan
+
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: ${{ secrets.OIDC_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: terraform apply
         uses: dflook/terraform-apply@v2
         with:
           path: infra/
-          auto_approve: true
-
+          auto_approve: false
