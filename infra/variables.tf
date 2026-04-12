@@ -117,7 +117,7 @@ variable "cluster_name" {
 }
 
 variable "app_image" {
-    description = "docker image"
+    description = " dummy docker image"
     type        = string
     default     = "nginx:latest"
 }
