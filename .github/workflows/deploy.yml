@@ -1,7 +1,11 @@
-name: Terraform Deploy Pipeline
+name: Build docker image and push it to AWS ECR with OIDC
 
-on: 
+on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: 
+      - "docker/**"
 
 permissions:
   id-token: write
@@ -10,11 +14,16 @@ permissions:
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
 
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
+  
+
 jobs:
-  plan:
+  build: 
+    name: Build the image and deploy it to AWS ECR
     runs-on: ubuntu-latest
-    name: Create a plan for the Terraform infrastructure
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,36 +32,52 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
           role-to-assume: ${{ secrets.OIDC_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
+
+      - name: Build Docker image
+        id: build-image
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+        run: |
+          docker buildx build \
+          --platform linux/amd64 \
+          --build-arg DATABASE_URL="$DATABASE_URL" \
+          -f docker/Dockerfile \
+          -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}" \
+          .
+
+          echo "image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}" >> $GITHUB_OUTPUT
+        
+
+      - name: Push Docker image to ECR
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+        run: |
+          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}"
 
 
-      - name: terraform fmt (lint code)
-        uses: dflook/terraform-fmt-check@v2
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
-          path: infra/
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
 
 
-      - name: terraform validate
-        uses: dflook/terraform-validate@v2
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
         with:
-          path: infra/
-
-
-      - name: terraform plan
-        uses: dflook/terraform-plan@v2
-        with:
-          path: infra/
-
-
-      - name: get outputs
-        uses: dflook/terraform-output@v2
-        with:
-          path: infra/
-    
-
-      - name: terraform apply
-        uses: dflook/terraform-apply@v2
-        with:
-          path: infra/
-          auto_approve: true
-
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ vars.ECS_SERVICE }}
+          cluster: ${{ vars.ECS_CLUSTER }}
+          wait-for-service-stability: true
