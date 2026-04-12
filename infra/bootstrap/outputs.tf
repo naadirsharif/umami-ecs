@@ -3,12 +3,12 @@ output "ecr_repo_url" {
     value       = aws_ecr_repository.app_repo.repository_url
 }
 
-output "oidc_arn" {
+output "oidc_role_arn" {
     description = "ARN of the OIDC IAM role"
     value = aws_iam_role.github_actions.arn
 }
 
-output "s3_arn" {
-  description = "Bucket name"
+output "state_bucket" {
+  description = "Name of state bucket"
   value       = aws_s3_bucket.tf_state.bucket
 }
