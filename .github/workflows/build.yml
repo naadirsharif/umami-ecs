@@ -43,7 +43,6 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker buildx build \
-            --build-arg DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
             --platform linux/amd64 \
             -t $PROJECT_NAME:$IMAGE_TAG \
             -f docker/Dockerfile \

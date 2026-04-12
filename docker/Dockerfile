@@ -2,9 +2,6 @@
 
 # Full Bullseye image to build the app
 FROM node:18-bullseye AS builder
-# Required for Prisma generate during build (CI/CD)
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
 # Set destination for copy
 WORKDIR /app
 # Copy Node App dependencies 
