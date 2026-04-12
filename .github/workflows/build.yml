@@ -37,18 +37,18 @@ jobs:
         env:
           GITHUB_SHA: ${{ github.sha }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPO_NAME: ${{ vars.REPO_NAME }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
         run: |
           docker buildx build \
           --platform linux/amd64 \
           -f Docker/Dockerfile \
-          -t "${ECR_REGISTRY}/${REPO_NAME}:${GITHUB_SHA}" \
+          -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}" \
           .
         
       - name: Push Docker image to ECR
         env:
           GITHUB_SHA: ${{ github.sha }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPO_NAME: ${{ vars.REPO_NAME }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
         run: |
-          docker push "${ECR_REGISTRY}/${REPO_NAME}:${GITHUB_SHA}"
+          docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}"
