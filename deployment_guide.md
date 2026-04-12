@@ -38,6 +38,7 @@ Run locally:
 ```bash
 cd infra/bootstrap
 terraform init
+terraform plan
 terraform apply
 ```
 
