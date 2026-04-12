@@ -1,4 +1,4 @@
-name: Build docker image and push it to AWS ECR with OIDC
+name: CI/CD pipeline (Docker → ECR → ECS)
 
 on:
   workflow_dispatch:
