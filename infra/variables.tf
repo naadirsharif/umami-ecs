@@ -113,12 +113,13 @@ variable "alb_sg_description" {
 variable "cluster_name" {
     type = string
     description = "name of ecs cluster"
-    default = "umami-cluster"
+    default     = "umami-cluster"
 }
 
 variable "app_image" {
     description = "docker image"
-    type = string
+    type        = string
+    default     = "nginx:latest"
 }
 
 variable "db_string" {
