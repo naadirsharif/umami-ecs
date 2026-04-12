@@ -43,7 +43,7 @@ variable "github_repo" {
 
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket"
-  default     = "umami-tf-state"
+  default     = "umami-tf-state-bucket"
 }
 
 #################################################################
