@@ -1,7 +1,7 @@
 # Stage 1: Build
 
 # Full Bullseye image to build the app
-FROM node:18-bullseye AS builder
+FROM node:20-bullseye AS builder
 # Database URL 
 ARG DATABASE_URL
 ENV DATABASE_URL=${DATABASE_URL}
@@ -32,6 +32,8 @@ COPY --from=builder /app/generated ./generated
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./
+COPY --from=builder /app/.next/static ./.next/static
+
 # Copy Next.js standalone build (to run app)
 COPY --from=builder /app/.next/standalone ./
 # Copy app code
