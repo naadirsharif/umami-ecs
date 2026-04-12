@@ -20,7 +20,7 @@ You need:
 	- DynamoDB
 	- ALB 
     - ACM 
-- A domain managed in Cloudflare
+- A domain managed via Cloudflare DNS, as DNS provisioning is automated through Terraform
 - Docker installed (local testing only)
 - Terraform installed locally (for bootstrap step)
 
