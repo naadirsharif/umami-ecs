@@ -3,10 +3,9 @@ name: Terraform Deploy Pipeline
 on: 
   workflow_dispatch:
 
-
 permissions:
+  id-token: write
   contents: read
-  pull-requests: write
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
@@ -26,7 +25,33 @@ jobs:
           role-to-assume: ${{ secrets.OIDC_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
+
+      - name: terraform fmt (lint code)
+        uses: dflook/terraform-fmt-check@v2
+        with:
+          path: infra/
+
+
+      - name: terraform validate
+        uses: dflook/terraform-validate@v2
+        with:
+          path: infra/
+
+
       - name: terraform plan
         uses: dflook/terraform-plan@v2
         with:
           path: infra/
+
+
+      - name: get outputs
+        uses: dflook/terraform-output@v2
+        with:
+          path: infra/
+    
+
+      - name: terraform apply
+        uses: dflook/terraform-apply@v2
+        with:
+          path: infra/
+
