@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "main" {
   cpu                      = 1024
   memory                   = 2048
 
-  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+  execution_role_arn = aws_iam_role.ecs_execution_role.arn
 
   # Dummy image -> will be overwritten by CI/CD
   container_definitions = <<TASK_DEFINITION
