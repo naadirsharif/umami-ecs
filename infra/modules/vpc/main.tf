@@ -57,6 +57,7 @@ resource "aws_internet_gateway" "umami-igw" {
 }
 
 resource "aws_nat_gateway" "umami-nat" {
+  availability_mode = var.availability_mode
   vpc_id            = aws_vpc.umami-vpc.id
   connectivity_type = var.nat_connectivity_type
   tags              = var.tags

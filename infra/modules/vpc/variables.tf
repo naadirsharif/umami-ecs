@@ -27,3 +27,8 @@ variable "nat_connectivity_type" {
   type        = string
   default     = "public"
 }
+
+variable "availability_mode" {
+  type    = string
+  default = "regional"
+}
