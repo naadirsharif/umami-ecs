@@ -14,7 +14,7 @@ module "alb" {
   health_path        = var.health_path
   vpc_id             = module.vpc.vpc_id
   public_subnets     = module.vpc.public_subnet_ids
-  cert_arn           = module.acm.certificate_arn
+  cert_arn           = module.acm.certificate_validation_arn
   sg_name_alb        = var.sg_name_alb
   alb_sg_description = var.alb_sg_description
 }
