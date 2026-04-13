@@ -34,7 +34,7 @@ resource "aws_iam_role_policy" "ecs_ssm_access" {
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
         ]
-        Resource = aws_ssm_parameter.db_connection_string.arn
+        Resource = "*"
       }
     ]
   })
