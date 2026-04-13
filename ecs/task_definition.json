@@ -35,6 +35,7 @@
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "REPLACE_ME",
+          "awslogs-region": "eu-central-1",
           "awslogs-stream-prefix": "umami-logs"
         }
       }
