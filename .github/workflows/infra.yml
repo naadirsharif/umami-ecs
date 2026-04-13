@@ -74,4 +74,4 @@ jobs:
         uses: dflook/terraform-apply@v2
         with:
           path: infra/
-          auto_approve: false
+          auto_approve: true
