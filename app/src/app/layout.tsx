@@ -1,3 +1,5 @@
+console.log("DATABASE_URL:", process.env.DATABASE_URL)
+
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { Providers } from './Providers';
