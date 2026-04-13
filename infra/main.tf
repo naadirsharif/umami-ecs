@@ -43,9 +43,9 @@ module "ecs" {
 }
 
 module "dns" {
-  source               = "./modules/dns"
-  subdomain_name       = var.subdomain_name
-  alb_dns              = module.alb.alb_dns_name
-  zone_id_cloudflare   = var.zone_id_cloudflare
+  source             = "./modules/dns"
+  subdomain_name     = var.subdomain_name
+  alb_dns            = module.alb.alb_dns_name
+  zone_id_cloudflare = var.zone_id_cloudflare
 }
 
