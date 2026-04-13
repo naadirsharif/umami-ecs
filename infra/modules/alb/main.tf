@@ -24,7 +24,7 @@ resource "aws_lb_target_group" "ecs_tg" {
     healthy_threshold   = 3
     interval            = 30
     protocol            = "HTTP"
-    timeout             = 30
+    timeout             = 5
     unhealthy_threshold = 2
     path                = var.health_path
   }
