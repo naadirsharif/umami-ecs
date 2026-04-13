@@ -1,4 +1,4 @@
-name: CI/CD pipeline (Docker → ECR → ECS)
+name: Build and Push Image to AWS ECR (CI)
 
 on:
   workflow_dispatch:
@@ -15,7 +15,6 @@ env:
   AWS_REGION: ${{ vars.AWS_REGION }}
 
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
   
 
 jobs:
@@ -62,21 +61,3 @@ jobs:
           ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
         run: |
           docker push "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}"
-
-
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
-        with:
-          task-definition: ecs/task_definition.json
-          container-name: umami-ecs
-          image: ${{ steps.build-image.outputs.image }}
-
-
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: umami
-          cluster: umami-cluster
-          wait-for-service-stability: true
