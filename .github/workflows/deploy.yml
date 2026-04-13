@@ -16,7 +16,6 @@ env:
 
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
   ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
-  CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
   
 
 jobs:
@@ -69,8 +68,8 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@c804dfbdd57f713b6c079302a4c01db7017a36fc
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
+          task-definition: ecs/task_definition.json
+          container-name: umami-ecs
           image: ${{ steps.build-image.outputs.image }}
 
 
@@ -78,6 +77,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@df9643053eda01f169e64a0e60233aacca83799a
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ vars.ECS_SERVICE }}
-          cluster: ${{ vars.ECS_CLUSTER }}
+          service: umami
+          cluster: umami-cluster
           wait-for-service-stability: true

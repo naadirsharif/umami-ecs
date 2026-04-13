@@ -1,0 +1,43 @@
+{
+  "family": "umami-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "REPLACE_ME",
+  "containerDefinitions": [
+    {
+      "name": "umami-ecs",
+      "image": "REPLACE_ME",
+      "cpu": 1024,
+      "memory": 2048,
+      "essential": true,
+      "environment": [
+        {
+          "name": "HOST",
+          "value": "0.0.0.0"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "REPLACE_ME"
+        }
+      ],
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "REPLACE_ME",
+          "awslogs-stream-prefix": "umami-logs"
+        }
+      }
+    }
+  ]
+}
