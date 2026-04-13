@@ -1,6 +1,6 @@
 variable "alb_dns" {
-    description = "name of the DNS of ALB"
-    type        = string
+  description = "name of the DNS of ALB"
+  type        = string
 }
 
 variable "zone_id" {

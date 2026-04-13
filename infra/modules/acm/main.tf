@@ -36,7 +36,7 @@ resource "cloudflare_dns_record" "cert_validation" {
   content = each.value.resource_record_value
   ttl     = 1
   proxied = false
-} 
+}
 
 ## ACM Validation
 resource "aws_acm_certificate_validation" "cert_validation" {

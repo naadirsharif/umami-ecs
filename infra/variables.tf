@@ -19,39 +19,39 @@ variable "region" {
 # VPC Variables 
 
 variable "availability_zones" {
-    description = "availability zones 1a-1c"
-    type        = list(string)
-    default     = [
-        "eu-central-1a",
-        "eu-central-1b",
-        "eu-central-1c"
-    ]
+  description = "availability zones 1a-1c"
+  type        = list(string)
+  default = [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
+  ]
 }
 
 variable "cidr_vpc" {
-    description = "CIDR block of VPC"
-    type        = string 
-    default     = "10.0.0.0/16"
+  description = "CIDR block of VPC"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
 variable "cidrs_public_subnet" {
-    description = "CIDR blocks of public subnets"
-    type        = list(string)
-    default     = [
-        "10.0.1.0/24",
-        "10.0.2.0/24",
-        "10.0.3.0/24"
-    ]
+  description = "CIDR blocks of public subnets"
+  type        = list(string)
+  default = [
+    "10.0.1.0/24",
+    "10.0.2.0/24",
+    "10.0.3.0/24"
+  ]
 }
 
 variable "cidrs_private_subnet" {
-    description = "CIDR blocks of private subnets"
-    type        = list(string)
-    default     = [
-        "10.0.4.0/24",
-        "10.0.5.0/24",
-        "10.0.6.0/24"
-    ]
+  description = "CIDR blocks of private subnets"
+  type        = list(string)
+  default = [
+    "10.0.4.0/24",
+    "10.0.5.0/24",
+    "10.0.6.0/24"
+  ]
 }
 
 #################################################################
@@ -59,51 +59,51 @@ variable "cidrs_private_subnet" {
 # ALB variables
 
 variable "alb_name" {
-    description = "name of main ALB"
-    type        = string
-    default     = "main-alb-tf"
+  description = "name of main ALB"
+  type        = string
+  default     = "main-alb-tf"
 }
 
 variable "alb_type" {
-    description = "Type of ALB"
-    type        = string
-    default     = "application"
+  description = "Type of ALB"
+  type        = string
+  default     = "application"
 }
 
 variable "target_group" {
-    description = "Name of Target Group"
-    type        = string
-    default     = "ecs-tg"
+  description = "Name of Target Group"
+  type        = string
+  default     = "ecs-tg"
 }
 
 variable "tg_port" {
-    description = "port on which container listens"
-    type        = number
-    default     = 3000
+  description = "port on which container listens"
+  type        = number
+  default     = 3000
 }
 
 variable "health_path" {
-    description = "The http path the alb uses to check if container is healthy"
-    type        = string
+  description = "The http path the alb uses to check if container is healthy"
+  type        = string
 }
 
 variable "ssl_policy" {
-    description = "Policy of SSL"
-    type        = string
-    default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  description = "Policy of SSL"
+  type        = string
+  default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 }
 
 # ALB SG
 variable "sg_name_alb" {
-    description = "name of the security group of the alb"
-    type        = string
-    default     = "alb_sg"
+  description = "name of the security group of the alb"
+  type        = string
+  default     = "alb_sg"
 }
 
 variable "alb_sg_description" {
-    description = "description for the security group of the alb"
-    type        = string
-    default     = "Allow HTTP/HTTPS traffic"
+  description = "description for the security group of the alb"
+  type        = string
+  default     = "Allow HTTP/HTTPS traffic"
 }
 
 #################################################################
@@ -111,53 +111,53 @@ variable "alb_sg_description" {
 # ECS variables
 
 variable "cluster_name" {
-    type = string
-    description = "name of ecs cluster"
-    default     = "umami-cluster"
+  type        = string
+  description = "name of ecs cluster"
+  default     = "umami-cluster"
 }
 
 variable "app_image" {
-    description = " dummy docker image"
-    type        = string
-    default     = "nginx:latest"
+  description = " dummy docker image"
+  type        = string
+  default     = "nginx:latest"
 }
 
 variable "db_string" {
-    description = "connection string of databse"
-    sensitive   = true
+  description = "connection string of databse"
+  sensitive   = true
 }
 
 # ECS SG
 variable "sg_name_ecs" {
-    description = "name of the security group for ecs"
-    type        = string
-    default     = "ecs_sg"
+  description = "name of the security group for ecs"
+  type        = string
+  default     = "ecs_sg"
 }
 
 variable "ecs_sg_description" {
-    description = "description for the security group of ecs"
-    type        = string
-    default     = "Allow only from ALB"
+  description = "description for the security group of ecs"
+  type        = string
+  default     = "Allow only from ALB"
 }
 
 variable "container_port" {
-    description = "internal port of container"
-    type        = number
-    default     = 3000
+  description = "internal port of container"
+  type        = number
+  default     = 3000
 }
 
 #################################################################
 
 # ACM variables
 
-variable "domain_name" {  
-    description = "name of domain"
-    type        = string
+variable "domain_name" {
+  description = "name of domain"
+  type        = string
 }
 
 variable "acm_validation_method" {
-    description = "validation method of ACM"
-    type        = string
+  description = "validation method of ACM"
+  type        = string
 }
 
 #################################################################
@@ -165,8 +165,8 @@ variable "acm_validation_method" {
 # ECR variables
 
 variable "ecr_name" {
-    type    = string
-    default = "umami-deployment"
+  type    = string
+  default = "umami-deployment"
 }
 
 #################################################################
@@ -174,8 +174,8 @@ variable "ecr_name" {
 # IAM Variables
 
 variable "ecs_iam_name" {
-    type = string
-    default = "ecs_role"
+  type    = string
+  default = "ecs_role"
 }
 
 #################################################################
@@ -183,10 +183,10 @@ variable "ecs_iam_name" {
 # Cloudflare
 
 variable "cloudflare_api_token" {
-    sensitive = true
+  sensitive = true
 }
 
 variable "zone_id_cloudflare" {
-    type = string
+  type = string
 }
 

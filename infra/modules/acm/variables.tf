@@ -2,14 +2,14 @@ variable "tags" {
   type = map(string)
 }
 
-variable "domain_name" {  
-    description = "name of domain"
-    type        = string
+variable "domain_name" {
+  description = "name of domain"
+  type        = string
 }
 
 variable "acm_validation_method" {
-    description = "validation method of ACM"
-    type        = string
+  description = "validation method of ACM"
+  type        = string
 }
 
 variable "zone_id" {

@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "tf_state" {
-  bucket = var.s3_bucket_name
+  bucket           = var.s3_bucket_name
   bucket_namespace = "global"
 
-  tags =  var.tags
+  tags = var.tags
 }
 
 resource "aws_s3_bucket_public_access_block" "tf_state" {

@@ -24,8 +24,8 @@ resource "aws_ecs_task_definition" "main" {
   cpu                      = 1024
   memory                   = 2048
 
-# Dummy image -> will be overwritten by CI/CD
-container_definitions = <<TASK_DEFINITION
+  # Dummy image -> will be overwritten by CI/CD
+  container_definitions = <<TASK_DEFINITION
 [
   {
     "name": "umami-ecs",
@@ -77,22 +77,22 @@ resource "aws_ecs_service" "main" {
   task_definition = aws_ecs_task_definition.main.arn
   desired_count   = 3
   iam_role        = aws_iam_role.ecs_iam.arn
-  depends_on      = [
+  depends_on = [
     aws_iam_role_policy_attachment.cw_logs,
     aws_iam_role_policy_attachment.ecr_pull
-    ]
+  ]
 
   network_configuration {
     subnets = var.private_subnet_ids
 
     assign_public_ip = false
-    security_groups = [aws_security_group.ecs_sg.id]
+    security_groups  = [aws_security_group.ecs_sg.id]
   }
 
   load_balancer {
-    container_name = "umami-ecs"
-    container_port = var.container_port
+    container_name   = "umami-ecs"
+    container_port   = var.container_port
     target_group_arn = var.tg_arn
   }
-tags = var.tags
+  tags = var.tags
 }

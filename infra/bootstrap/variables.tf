@@ -12,7 +12,7 @@ variable "tags" {
 
 variable "region" {
   description = "AWS Region"
-  type = string
+  type        = string
 }
 
 #################################################################
@@ -20,9 +20,9 @@ variable "region" {
 # ECR
 
 variable "ecr_repo_name" {
-    description = "ECR Repo name"
-    type        = string
-    default     = "umami-repo"
+  description = "ECR Repo name"
+  type        = string
+  default     = "umami-repo"
 }
 
 #################################################################
@@ -34,7 +34,7 @@ variable "oidc_iam_name" {
 }
 
 variable "github_repo" {
-    description = "github repository in the format 'owner/repo' that is allowed to assume iam role via GitHub Actions OIDC"
+  description = "github repository in the format 'owner/repo' that is allowed to assume iam role via GitHub Actions OIDC"
 }
 
 #################################################################
@@ -51,6 +51,6 @@ variable "s3_bucket_name" {
 # DynamoDB
 
 variable "dynamo_db_name" {
-  description  = "Name of DynamoDB Table"
-  default      = "tf-lock"
+  description = "Name of DynamoDB Table"
+  default     = "tf-lock"
 }

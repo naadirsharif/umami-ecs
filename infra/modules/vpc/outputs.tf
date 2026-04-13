@@ -1,6 +1,6 @@
 output "vpc_id" {
-    description = "ID of the VPC"
-    value = aws_vpc.umami-vpc.id
+  description = "ID of the VPC"
+  value       = aws_vpc.umami-vpc.id
 }
 
 
@@ -22,11 +22,11 @@ output "private_subnet_ids" {
 }
 
 output "igw_id" {
-    description = "ID of Internet Gateway"
-    value = aws_internet_gateway.umami-igw.id
+  description = "ID of Internet Gateway"
+  value       = aws_internet_gateway.umami-igw.id
 }
 
 output "nat_id" {
-    description = "ID of NAT Gateway"
-    value = aws_nat_gateway.umami-nat.id
+  description = "ID of NAT Gateway"
+  value       = aws_nat_gateway.umami-nat.id
 }

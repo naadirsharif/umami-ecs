@@ -3,7 +3,7 @@
 ## VPC
 resource "aws_vpc" "umami-vpc" {
   cidr_block = var.cidr_vpc
-  tags = var.tags
+  tags       = var.tags
 }
 
 ## Public Subnets
@@ -96,7 +96,7 @@ resource "aws_route_table" "private" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_nat_gateway.umami-nat.id
   }
-  tags           = var.tags
+  tags = var.tags
 }
 
 ## Private Route Table Assocications
