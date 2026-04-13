@@ -46,7 +46,6 @@ jobs:
         run: |
           docker buildx build \
           --platform linux/amd64 \
-          --build-arg DATABASE_URL="$DATABASE_URL" \
           -f docker/Dockerfile \
           -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}" \
           .
