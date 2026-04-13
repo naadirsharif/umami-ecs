@@ -26,42 +26,47 @@ resource "aws_ecs_task_definition" "main" {
 
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
 
-  # Dummy image -> will be overwritten by CI/CD
-  container_definitions = <<TASK_DEFINITION
-[
+ 
+container_definitions = jsonencode([
   {
-    "name": "umami-ecs",
-    "image": "${var.app_image}", 
-    "cpu": 1024,
-    "memory": 2048,
-    "essential": true,
-    "environment": [
-      {"name": "HOST", "value": "0.0.0.0"}
-    ],
-    "secrets": [
+    name      = "umami-ecs"
+    image     = var.app_image
+    cpu       = 1024
+    memory    = 2048
+    essential = true
+
+    environment = [
       {
-        "name": "DATABASE_URL",
-        "valueFrom": "${aws_ssm_parameter.db_connection_string.arn}"
+        name  = "HOST"
+        value = "0.0.0.0"
       }
-    ],
-    "portMappings": [
+    ]
+
+    secrets = [
       {
-        "containerPort": 3000,
-        "hostPort": 3000,
-        "protocol": "tcp"
+        name      = "DATABASE_URL"
+        valueFrom = aws_ssm_parameter.db_connection_string.arn
       }
-    ],
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "${aws_cloudwatch_log_group.main.name}",
-        "awslogs-region": "${var.region}",
-        "awslogs-stream-prefix": "umami-logs"
+    ]
+
+    portMappings = [
+      {
+        containerPort = 3000
+        hostPort      = 3000
+        protocol      = "tcp"
+      }
+    ]
+
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        awslogs-group         = aws_cloudwatch_log_group.main.name
+        awslogs-region        = var.region
+        awslogs-stream-prefix = "umami-logs"
       }
     }
   }
-]
-TASK_DEFINITION
+])
 
 
   runtime_platform {
