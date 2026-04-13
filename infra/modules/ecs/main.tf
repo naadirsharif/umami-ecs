@@ -27,46 +27,48 @@ resource "aws_ecs_task_definition" "main" {
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
 
 
-  container_definitions = jsonencode([
-    {
-      name      = "umami-ecs"
-      image     = var.app_image
-      cpu       = 1024
-      memory    = 2048
-      essential = true
+ container_definitions = <<TASK_DEFINITION
+[
+  {
+    "name": "umami-ecs",
+    "image": "${var.app_image}",
+    "cpu": 1024,
+    "memory": 2048,
+    "essential": true,
 
-      environment = [
-        {
-          name  = "HOST"
-          value = "0.0.0.0"
-        }
-      ]
+    "environment": [
+      {
+        "name": "HOST",
+        "value": "0.0.0.0"
+      }
+    ],
 
-      secrets = [
-        {
-          name      = "DATABASE_URL"
-          valueFrom = aws_ssm_parameter.db_connection_string.arn
-        }
-      ]
+    "secrets": [
+      {
+        "name": "DATABASE_URL",
+        "valueFrom": "${aws_ssm_parameter.db_connection_string.arn}"
+      }
+    ],
 
-      portMappings = [
-        {
-          containerPort = 3000
-          hostPort      = 3000
-          protocol      = "tcp"
-        }
-      ]
+    "portMappings": [
+      {
+        "containerPort": 3000,
+        "hostPort": 3000,
+        "protocol": "tcp"
+      }
+    ],
 
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.main.name
-          awslogs-region        = var.region
-          awslogs-stream-prefix = "umami-logs"
-        }
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${aws_cloudwatch_log_group.main.name}",
+        "awslogs-region": "${var.region}",
+        "awslogs-stream-prefix": "umami-logs"
       }
     }
-  ])
+  }
+]
+TASK_DEFINITION
 
 
   runtime_platform {
