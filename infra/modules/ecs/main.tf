@@ -24,6 +24,8 @@ resource "aws_ecs_task_definition" "main" {
   cpu                      = 1024
   memory                   = 2048
 
+  execution_role_arn       = aws_iam_role.ecs_execution_role.arn
+
   # Dummy image -> will be overwritten by CI/CD
   container_definitions = <<TASK_DEFINITION
 [
@@ -76,11 +78,6 @@ resource "aws_ecs_service" "main" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.main.arn
   desired_count   = var.desired_count
-  iam_role        = aws_iam_role.ecs_iam.arn
-  depends_on = [
-    aws_iam_role_policy_attachment.cw_logs,
-    aws_iam_role_policy_attachment.ecr_pull
-  ]
 
   network_configuration {
     subnets = var.private_subnet_ids
