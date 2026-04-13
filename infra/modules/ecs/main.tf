@@ -27,7 +27,7 @@ resource "aws_ecs_task_definition" "main" {
   execution_role_arn = aws_iam_role.ecs_execution_role.arn
 
 
- container_definitions = <<TASK_DEFINITION
+  container_definitions = <<TASK_DEFINITION
 [
   {
     "name": "umami-ecs",
