@@ -135,7 +135,8 @@ resource "aws_iam_policy" "terraform_full_access" {
           "ssm:*",
           "logs:*",
           "cloudwatch:*",
-          "route53:*"
+          "route53:*",
+          "elasticloadbalancing:*"
         ]
         Resource = "*"
       }
