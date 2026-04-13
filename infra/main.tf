@@ -31,8 +31,10 @@ module "ecs" {
   region             = var.region
   source             = "./modules/ecs"
   tags               = var.tags
+  container_port     = var.container_port
   app_image          = var.app_image
   cluster_name       = var.cluster_name
+  desired_count      = var.desired_count
   alb_sg_id          = module.alb.alb_sg_id
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnet_ids
@@ -41,9 +43,9 @@ module "ecs" {
 }
 
 module "dns" {
-  source      = "./modules/dns"
-  domain_name = var.domain_name
-  alb_dns     = module.alb.alb_dns_name
-  zone_id     = var.zone_id_cloudflare
+  source               = "./modules/dns"
+  subdomain_name       = var.subdomain_name
+  alb_dns              = module.alb.alb_dns_name
+  zone_id_cloudflare   = var.zone_id_cloudflare
 }
 

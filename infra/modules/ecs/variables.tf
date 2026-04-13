@@ -44,7 +44,6 @@ variable "ecs_sg_description" {
 variable "container_port" {
   description = "internal port of container"
   type        = number
-  default     = 3000
 }
 
 variable "tg_arn" {
@@ -64,3 +63,6 @@ variable "ecs_iam_name" {
   default = "ecs_role"
 }
 
+variable "desired_count" {
+  type = number
+}

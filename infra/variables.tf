@@ -119,12 +119,16 @@ variable "cluster_name" {
 variable "app_image" {
   description = " dummy docker image"
   type        = string
-  default     = "nginx:latest"
 }
 
 variable "db_string" {
   description = "connection string of databse"
   sensitive   = true
+}
+
+variable "desired_count" {
+  type        = number
+  description = "Desired number of ECS tasks for service"
 }
 
 # ECS SG
@@ -143,7 +147,6 @@ variable "ecs_sg_description" {
 variable "container_port" {
   description = "internal port of container"
   type        = number
-  default     = 3000
 }
 
 #################################################################
@@ -158,15 +161,6 @@ variable "domain_name" {
 variable "acm_validation_method" {
   description = "validation method of ACM"
   type        = string
-}
-
-#################################################################
-
-# ECR variables
-
-variable "ecr_name" {
-  type    = string
-  default = "umami-deployment"
 }
 
 #################################################################
@@ -190,3 +184,6 @@ variable "zone_id_cloudflare" {
   type = string
 }
 
+variable "subdomain_name" {
+  type = string
+}

@@ -12,7 +12,7 @@ terraform {
 
   # Configure backend and state locking
   backend "s3" {
-    bucket         = " "
+    bucket         = "umami-tf-state-bucket"
     key            = "terraform.tfstate"
     region         = "eu-central-1"
     dynamodb_table = "tf-lock"

@@ -3,11 +3,11 @@ variable "alb_dns" {
   type        = string
 }
 
-variable "zone_id" {
+variable "zone_id_cloudflare" {
   type = string
 }
 
-variable "domain_name" {
+variable "subdomain_name" {
   type = string
 }
 
