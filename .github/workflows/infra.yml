@@ -1,4 +1,4 @@
-name: Build and Apply Terraform infrastructure
+name: Terraform Infrastructure Deployment
 
 on: 
   workflow_dispatch:
@@ -13,7 +13,7 @@ env:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    name: Create a plan for the Terraform infrastructure
+    name: Terraform plan
     
     steps:
       - name: Checkout code
