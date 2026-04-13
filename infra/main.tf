@@ -25,6 +25,7 @@ module "acm" {
   domain_name           = var.domain_name
   acm_validation_method = var.acm_validation_method
   zone_id               = var.zone_id_cloudflare
+  subdomain_name        = var.subdomain_name
 }
 
 module "ecs" {
