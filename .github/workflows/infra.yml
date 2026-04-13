@@ -10,6 +10,10 @@ permissions:
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
 
+  TF_VAR_db_string: ${{ secrets.DB_STRING }}
+  TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
+
 jobs:
   plan:
     runs-on: ubuntu-latest
@@ -39,6 +43,10 @@ jobs:
 
 
       - name: terraform plan
+        env:
+          TF_VAR_db_string: ${{ secrets.DB_STRING }}
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
         uses: dflook/terraform-plan@v2
         with:
           path: infra/
