@@ -1,4 +1,4 @@
-name: Terraform Infrastructure Deployment
+name: Terraform Infra & ECS Deployment (CD)
 
 on: 
   workflow_dispatch:
