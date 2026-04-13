@@ -118,3 +118,32 @@ resource "aws_iam_role_policy" "passrole" {
     ]
   })
 }
+
+resource "aws_iam_policy" "terraform_full_access" {
+  name = "terraform-full-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "acm:*",
+          "iam:*",
+          "ec2:*",
+          "vpc:*",
+          "ssm:*",
+          "logs:*",
+          "cloudwatch:*",
+          "route53:*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_full_attach" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = aws_iam_policy.terraform_full_access.arn
+}
