@@ -22,7 +22,7 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
 
 resource "aws_iam_role_policy" "ecs_ssm_access" {
   name = "ecs-ssm-access"
-  role = aws_iam_role.ecs_execution_role.name
+  role = aws_iam_role.ecs_execution_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -33,6 +33,13 @@ resource "aws_iam_role_policy" "ecs_ssm_access" {
           "ssm:GetParameter",
           "ssm:GetParameters",
           "ssm:GetParametersByPath"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
         ]
         Resource = "*"
       }
