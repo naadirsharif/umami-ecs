@@ -35,6 +35,19 @@ terraform plan
 terraform apply
 ```
 
+After running `terraform apply`, Terraform will prompt for required variables:
+```bash
+var.region
+  AWS Region
+
+  Enter a value: eu-central-1
+
+var.github_repo
+  GitHub repository in the format 'owner/repo' that is allowed to assume IAM role via GitHub Actions OIDC
+
+  Enter a value: naadirsharif/infra-repo
+```
+
 Outputs (save these!)
 - state_bucket
 - ecr_repo_url
