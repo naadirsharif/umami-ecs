@@ -5,7 +5,7 @@ region = "eu-central-1"
 health_path = "/src/app/api/heartbeat"
 
 # ECS 
-app_image      = "530193444530.dkr.ecr.eu-central-1.amazonaws.com/umami-repo:fd3259bb9e079b5e8debac5cf99c70f3e9c728b6"
+app_image      = "530193444530.dkr.ecr.eu-central-1.amazonaws.com/umami-repo:906040cab488a91561150ff6be50af51dad02b89"
 desired_count  = 3 # Desired number of ECS tasks for service
 container_port = 3000
 
