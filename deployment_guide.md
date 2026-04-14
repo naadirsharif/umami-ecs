@@ -45,7 +45,7 @@ var.region
 var.github_repo
   GitHub repository in the format 'owner/repo' that is allowed to assume IAM role via GitHub Actions OIDC
 
-  Enter a value: naadirsharif/infra-repo
+  Enter a value: naadirsharif/umami-ecs
 ```
 
 Outputs (save these!)
