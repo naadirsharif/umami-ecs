@@ -19,7 +19,7 @@ env:
 
 jobs:
   build: 
-    name: Build the image and deploy it to AWS ECR
+    name: Build the image and deploy it to ECR
     runs-on: ubuntu-latest
 
     steps:
