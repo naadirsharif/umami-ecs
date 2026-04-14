@@ -1,33 +1,26 @@
 # 📘 Deployment Guide (AWS ECS / Terraform / GitHub Actions)
----
-This guide explains how to deploy this application to AWS using:
-- Terraform for infrastructure provisioning
-- GitHub Actions for CI/CD automation
-- AWS ECS (Fargate) for runtime execution
-- ECR for container images
 
-The setup is fully automated after bootstrap.
+This guide explains how to deploy this application using:
+- Terraform (infrastructure)
+- GitHub Actions (CI/CD)
+- Amazon ECS (Fargate runtime)
+- Amazon ECR (Docker images)
+- Cloudflare (DNS)
 
 ---
 
 ## 1. Prerequisites
----
+
 You need:
-- AWS account with permissions for:
-	- ECS / ECR
-	- IAM
-	- S3
-	- DynamoDB
-	- ALB 
-    - ACM 
-- A domain managed via Cloudflare DNS, as DNS provisioning is automated through Terraform
-- Docker installed (local testing only)
-- Terraform installed locally (for bootstrap step)
+- AWS account with permissions for: ECS / ECR, IAM, S3, DynamoDB, ALB, ACM 
+- Domain managed via Cloudflare (DNS is automated via Terraform)
+- Docker (optional for local testing)
+- Terraform (for bootstrap only)
 
 ---
 
 ## 2. Bootstrap (one-time setup)
----
+
 Bootstrap provisions foundational AWS resources:
 - S3 bucket (Terraform state)
 - DynamoDB table (state locking)
@@ -42,140 +35,187 @@ terraform plan
 terraform apply
 ```
 
-Output values:
-
-After completion:
-- oidc_role_arn
+Outputs (save these!)
 - state_bucket
 - ecr_repo_url
+- oidc_role_arn
 
--> Store these outputs securely for backend configuration.
-
----
-
-## 4. Infrastructure Configuration (after bootstrap)
----
-Required variables
+## 3. Configure Terraform Backend
 
 ```hcl
-aws_region = "eu-west-1"
+backend "s3" {
+  bucket         = "<YOUR_BUCKET_NAME>"
+  key            = "terraform.tfstate"
+  region         = "<YOUR_REGION>"
+  dynamodb_table = "tf-lock"
+  encrypt        = true
+}
+```
 
-# Application
-app_image = "<ACCOUNT_ID>.dkr.ecr.eu-west-1.amazonaws.com/app-repo:<IMAGE_TAG>"
+⚠️ Region must match bootstrap.
 
-app_port  = 8080
-app_count = 2
+---
 
-health_path = ""/src/app/api/heartbeat""
+## 4. CI Pipeline (Build & Push Docker Image)
+
+Workflow builds and pushes image to ECR.
+
+### Trigger
+- push to main
+- changes in docker/**
+
+### Required GitHub Settings
+
+Variables:
+- AWS_REGION
+- ECR_REPOSITORY
+
+Secrets:
+- OIDC_ARN
+
+Behavior
+- builds Docker image
+- tags with GITHUB_SHA
+- pushes to ECR
+
+-> No dummy image needed anymore ✔
+
+---
+
+## 5. Prepare Terraform Variables
+
+Copy the following template:
+```bash
+cp infra/terraform.tfvars.template infra/terraform.tfvars
+```
+
+### Minimal example
+```hcl
+# Region
+region = "eu-central-1"
+
+# Health Check
+health_path = "/src/app/api/heartbeat"
+
+# ECS
+app_image      = "530193444530.dkr.ecr.eu-central-1.amazonaws.com/umami-repo:<IMAGE_TAG>"
+desired_count  = 3   # Desired number of ECS tasks 
+container_port = 3000
 
 # Domain
-domain_name = "yourdomain.com"
-subdomain   = "tm"
+domain_name    = "nashar.dev"
+subdomain_name = "tm"
 
-# Networking
-vpc_cidr = "10.0.0.0/16"
-az_count = 2
-
-# DNS / TLS
 acm_validation_method = "DNS"
 ```
 
-### Important about app_image
-✔ never use latest
-✔ always use immutable tag (Git SHA)
+### Important
+
+- ✔ Use immutable image tags (Git SHA)
+- ❌ Never use latest
 
 ---
 
-## 4. GitHub Actions Required Settings
----
+## 6. CD Pipeline (Terraform Deployment)
+
+Workflow:
+- terraform fmt
+- terraform validate
+- terraform plan
+- terraform apply
+
+### Required GitHub Settings
+
+CD deploys infrastructure manually via workflow_dispatch.
+
+Deployments to production require manual approval via GitHub Environments (required reviewers enabled).
+
+Variables:
+- AWS_REGION
+
+Secrets:
+- OIDC_ARN
+- DB_STRING
+- CLOUDFLARE_API_TOKEN
+- ZONE_ID_CLOUDFLARE
+
+Required Permissions
 ```yaml
 permissions:
   id-token: write
   contents: read
 ```
 
-### Required environment variables
-- AWS_REGION 
-- PROJECT_NAME
-- REPO_NAME -> must equal ECR repo name used in bootstrap
-
-### Required secrets
-- OIDC_ROLE_ARN -> This is the role assumed via OIDC
-
----
-
-## 5. CI/CD (Build & Push Image)
----
-Workflow: Docker Build Pipeline
-
-Triggered on:
-- push to main
-- changes in docker/
-
-Steps:
-- build image
-- tag with git SHA
-- push to ECR
-
----
-
-## 6. Deployment Pipeline (Terraform Apply)
----
-### Workflow: Infrastructure Deployment
-
-### Steps:
-- format check
-- validation
-- plan
-- apply
-
-### Security
-
-Uses:
-- OIDC authentication
-- no AWS keys stored
-
----
-
-## 8. Deployment Output
----
-After successful apply:
-
-Application becomes available at:
-https://yourdomain.com
-
----
-
-## 10. Common Issues
----
-ECR not found
-
-→ bootstrap not executed or region mismatch
-
-⸻
-
-S3 backend error
-
-→ wrong region in backend config
-
-⸻
-
-Terraform state missing
-
-→ bootstrap S3 bucket not created
-
----
-
-## 11. Architecture Summary
----
-```text
-GitHub Actions
-   ↓
-Docker Build → ECR
-   ↓
-Terraform Apply
-   ↓
-ECS Fargate Deployment
-   ↓
-Public HTTPS Endpoint
+Terraform automatically creates DNS record:
+```hcl
+resource "cloudflare_dns_record" "alb_dns_record" {
+  zone_id = var.zone_id_cloudflare
+  name    = var.subdomain_name
+  ttl     = 1
+  type    = "CNAME"
+  content = var.alb_dns
+  proxied = false
 ```
+
+-> Traffic is routed to ALB.
+
+---
+
+## 7. Deployment Flow
+
+```text
+GitHub Actions (CI)
+   ↓
+Docker Build → ECR (tagged with SHA)
+   ↓
+Terraform Apply (CD)
+   ↓
+ECS Fargate
+   ↓
+ALB
+   ↓
+Cloudflare DNS
+```
+
+---
+
+## 8. Access
+
+### After deployment:
+```text
+https://<subdomain>.<domain>
+```
+
+### Example:
+```text
+https://tm.nashar.dev
+```
+
+---
+
+## 9. Common Issues
+
+### ECR not found
+
+→ bootstrap not executed or wrong region
+
+### Terraform backend error
+
+→ wrong S3 bucket / region mismatch
+
+### ALB not reachable
+
+→ DNS propagation delay or wrong Cloudflare config
+
+### ECS not starting
+
+→ check logs (CloudWatch) and environment variables
+
+---
+
+## 11. Notes
+
+- Bootstrap is run only once
+- CI builds images automatically
+- CD deploys infrastructure manually (via workflow_dispatch)
+- Infrastructure and application are fully decoupled
