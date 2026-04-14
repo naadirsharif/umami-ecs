@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "main" {
 
     "environment": [
       {
-        "name": "HOST",
+        "name": "HOSTNAME",
         "value": "0.0.0.0"
       }
     ],
