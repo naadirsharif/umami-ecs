@@ -34,8 +34,8 @@ export default function ({ children }) {
 
         <script
           defer
-          src="http://localhost:3000/script.js"
-          data-website-id="354374e5-d63f-4172-ab31-5c4da6f07208"
+          src="https://tm.nashar.dev/script.js"
+          data-website-id="09609fc4-6083-4f79-9801-350d598a7f86"
         />
       </head>
       <body>
