@@ -53,6 +53,8 @@ Outputs (save these!)
 - ecr_repo_url
 - oidc_role_arn
 
+---
+
 ## 3. Configure Terraform Backend
 
 The Terraform backend is configured in `provider.tf` using an S3 backend block.
