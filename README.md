@@ -16,3 +16,6 @@ docker run -p 3000:3000 \
 # Access app via browser
 http://localhost:3000
 ```
+
+
+<video controls src="images/umami-showcase.mov" title="Title"></video>
