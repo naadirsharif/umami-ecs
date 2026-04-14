@@ -55,6 +55,8 @@ Outputs (save these!)
 
 ## 3. Configure Terraform Backend
 
+The Terraform backend is configured in `provider.tf` using an S3 backend block.
+
 ```hcl
 backend "s3" {
   bucket         = "<YOUR_BUCKET_NAME>"
@@ -79,14 +81,14 @@ Workflow builds and pushes image to ECR.
 
 ### Required GitHub Settings
 
-Variables:
+`Variables:`
 - AWS_REGION
 - ECR_REPOSITORY
 
-Secrets:
+`Secrets:`
 - OIDC_ARN
 
-Behavior
+`Behavior:`
 - builds Docker image
 - tags with GITHUB_SHA
 - pushes to ECR
@@ -131,7 +133,7 @@ acm_validation_method = "DNS"
 
 ## 6. CD Pipeline (Terraform Deployment)
 
-Workflow:
+`Workflow:`
 - terraform fmt
 - terraform validate
 - terraform plan
@@ -143,23 +145,23 @@ CD deploys infrastructure manually via workflow_dispatch.
 
 Deployments to production require manual approval via GitHub Environments (required reviewers enabled).
 
-Variables:
+`Variables:`
 - AWS_REGION
 
-Secrets:
+`Secrets:`
 - OIDC_ARN
 - DB_STRING
 - CLOUDFLARE_API_TOKEN
 - ZONE_ID_CLOUDFLARE
 
-Required Permissions
+Allow GitHub Actions to generate an `OIDC token`
 ```yaml
 permissions:
   id-token: write
   contents: read
 ```
 
-Terraform automatically creates DNS record:
+Terraform automatically creates a `DNS record`:
 ```hcl
 resource "cloudflare_dns_record" "alb_dns_record" {
   zone_id = var.zone_id_cloudflare
