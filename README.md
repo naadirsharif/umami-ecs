@@ -18,4 +18,4 @@ http://localhost:3000
 ```
 
 
-<video controls src="images/umami-showcase.mov" title="Title"></video>
+![<video controls src="images/umami-showcase.mov" title="Title"></video>](images/umami-showcase.gif)
