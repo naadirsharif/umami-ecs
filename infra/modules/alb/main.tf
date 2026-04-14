@@ -7,7 +7,7 @@ resource "aws_lb" "main" {
   load_balancer_type         = var.alb_type
   security_groups            = [aws_security_group.alb_sg.id]
   subnets                    = var.public_subnets
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   tags = var.tags
 }
