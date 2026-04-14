@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "main" {
     "secrets": [
       {
         "name": "DATABASE_URL",
-        "valueFrom": "${aws_ssm_parameter.db_connection_string.arn}"
+        "valueFrom": "/umami/db/connection_string"
       }
     ],
 
