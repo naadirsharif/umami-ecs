@@ -10,7 +10,6 @@ docker build -t umami:latest -f docker/Dockerfile .
 # Run locally
 docker run -p 3000:3000 \
   -e DATABASE_URL=<database-url> \
-  -e HOST=0.0.0.0 \
   umami:latest
 
 # Access app via browser
