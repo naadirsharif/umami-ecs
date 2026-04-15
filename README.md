@@ -38,6 +38,8 @@ Rather than focusing only on functionality, this project enforces production-sty
 - **State Isolation:** Terraform state is stored in S3 with DynamoDB locking
 - **Immutable Images:** Docker images are versioned using Git SHA tags only
 - **Protected Deployments:** Production changes require manual approval via GitHub Environments
+- **High Availability:** ECS service deployed across multiple Availability Zones
+- **Observability:** CloudWatch used for ECS task logging and monitoring
 
 ---
 
