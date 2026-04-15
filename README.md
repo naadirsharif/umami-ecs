@@ -71,8 +71,8 @@ It provides essential analytics while keeping full control over your data.
 
 ---
 
-### Deployment Guide
-## [View full Guide](https://github.com/naadirsharif/umami-ecs/blob/main/deployment_guide.md)
+## Deployment Guide
+### [View full Guide](https://github.com/naadirsharif/umami-ecs/blob/main/deployment_guide.md)
 
 ---
 
