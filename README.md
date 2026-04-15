@@ -3,10 +3,10 @@ Production-grade deployment of a self-hosted analytics platform using modular Te
 
 ---
 
-## Why this project exists
+## Why this project matters
 The goal of this project is not just to run Umami, but to simulate how a production system is deployed in a real cloud environment.
 
-- reproducible infrastructure
+- reproducible infrastructure as code
 - secure-by-default architecture
 - fully automated deployments
 - separation of CI (build) and CD (infrastructure)
@@ -21,10 +21,10 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 ## Delivery Highlights
 
-- Docker image size: 2.1GB → ~134MB (~94% reduction) via multi-stage builds
-- ~2h manual AWS setup → ~10min fully automated deployment  
-- Terraform quality gates via fmt + validate (CI/CD pipeline checks)
-- AWS authentication fully migrated to GitHub OIDC
+- Docker image size: **2.1GB → ~134MB (~94% reduction)** via multi-stage builds
+- ~2h manual AWS setup → ~10min automated deployment (reduced deployment time by **~92%**)
+- Terraform quality gates via **fmt + validate** (CI/CD pipeline checks)
+- AWS authentication fully migrated to GitHub **OIDC**
 
 ---
 
@@ -32,18 +32,32 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 Rather than focusing only on functionality, this project enforces production-style constraints:
 
-- No public IPs for compute resources (ECS runs in private subnets)
-- ALB is the only public-facing component
-- IAM access is handled via GitHub OIDC (no AWS keys stored in GitHub)
-- Terraform state is isolated in S3 with DynamoDB locking
-- Docker images are immutable (Git SHA tagging only)
-- Production deployments require manual approval in GitHub Environments
+- **Private Compute:** ECS tasks run in private subnets (no public IPs) 
+- **Controlled Entry Point:** Only the Application Load Balancer is publicly accessible
+- **OIDC Authentication:** GitHub Actions uses OIDC (no static AWS credentials)
+- **State Isolation:** Terraform state is stored in S3 with DynamoDB locking
+- **Immutable Images:** Docker images are versioned using Git SHA tags only
+- **Protected Deployments:** Production changes require manual approval via GitHub Environments
 
 ---
 
-## Umami Showcase
+## Umami Demo
 
 ![alt text](images/umami-website-demo.gif)
+
+***Umami running on AWS ECS with HTTPS and the custom domain https://tm.nashar.dev.***
+
+---
+
+### About Umami
+
+Umami is a lightweight, self-hosted analytics platform for tracking website traffic and user behavior without relying on third-party services.
+
+- Tracks page views, visitors, and events  
+- Privacy-focused alternative to traditional analytics tools  
+- Simple, fast, and easy to self-host   
+
+It provides essential analytics while keeping full control over your data.
 
 ---
 
@@ -58,7 +72,7 @@ Rather than focusing only on functionality, this project enforces production-sty
 ---
 
 ## Deployment Guide
-https://github.com/naadirsharif/umami-ecs/blob/main/deployment_guide.md
+## [View full Guide](https://github.com/naadirsharif/umami-ecs/blob/main/deployment_guide.md)
 
 ---
 
@@ -77,6 +91,7 @@ docker run -p 3000:3000 \
 http://localhost:3000
 ```
 
+---
 
 ## Repository structure
 
