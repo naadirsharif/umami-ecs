@@ -49,7 +49,7 @@ Rather than focusing only on functionality, this project enforces production-sty
 
 ---
 
-### About Umami
+## About Umami
 
 Umami is a lightweight, self-hosted analytics platform for tracking website traffic and user behavior without relying on third-party services.
 
@@ -71,7 +71,7 @@ It provides essential analytics while keeping full control over your data.
 
 ---
 
-## Deployment Guide
+### Deployment Guide
 ## [View full Guide](https://github.com/naadirsharif/umami-ecs/blob/main/deployment_guide.md)
 
 ---
