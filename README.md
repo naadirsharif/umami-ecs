@@ -30,16 +30,20 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 ## Design & Security Decisions
 
-Rather than focusing only on functionality, this project enforces production-style constraints:
+Rather than focusing only on functionality, this project contains production-style principles:
 
+### Design
+- **High Availability:** ECS service deployed across multiple Availability Zones for high availability
+- **Traffic Management:** ALB handles routing, health checks, and distributes traffic across ECS tasks
+- **Observability:** CloudWatch used for ECS task logging and monitoring
+
+### Security
 - **Private Compute:** ECS tasks run in private subnets (no public IPs) 
 - **Controlled Entry Point:** Only the Application Load Balancer is publicly accessible
 - **OIDC Authentication:** GitHub Actions uses OIDC (no static AWS credentials)
 - **State Isolation:** Terraform state is stored in S3 with DynamoDB locking
 - **Immutable Images:** Docker images are versioned using Git SHA tags only
 - **Protected Deployments:** Production changes require manual approval via GitHub Environments
-- **High Availability:** ECS service deployed across multiple Availability Zones
-- **Observability:** CloudWatch used for ECS task logging and monitoring
 
 ---
 
