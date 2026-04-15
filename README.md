@@ -19,7 +19,7 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 ## Delivery Highlights
 
-- Docker image size: 2.1GB → ~180MB (~94% reduction) via multi-stage builds
+- Docker image size: 2.1GB → ~134MB (~94% reduction) via multi-stage builds
 - ~2h manual AWS setup → ~10min fully automated deployment  
 - Terraform quality gates via fmt + validate (CI/CD pipeline checks)
 - AWS authentication fully migrated to GitHub OIDC
