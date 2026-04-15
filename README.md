@@ -43,7 +43,7 @@ Rather than focusing only on functionality, this project enforces production-sty
 
 ## Umami Showcase
 
-![alt text](images/umami-showcase.gif)
+![alt text](images/umami-website-demo.gif)
 
 ---
 
@@ -51,9 +51,9 @@ Rather than focusing only on functionality, this project enforces production-sty
 
 ![alt text](images/cd_pipeline.png)
 
-- `Bootstrap:` Creates core AWS resources for Terraform (`S3 state bucket, DynamoDB lock table, ECR repo, IAM OIDC roles`). One-time setup before any deployments.
-- `CI (Build & Publish):` Builds the Docker image, tags it with the Git commit SHA, and pushes it to `Amazon ECR`. No infrastructure changes.
-- `CD (Infrastructure Deployment):` Triggered manually via GitHub Actions, runs `Terraform plan`, requires approval, `applies changes`, and deploys `ECS`.
+- **Bootstrap:** Creates core AWS resources for Terraform (**S3 state bucket, DynamoDB lock table, ECR repo, IAM OIDC roles**). One-time setup before any deployments.
+- **CI (Build & Publish):** Builds the Docker image, tags it with the Git commit SHA, and pushes it to **Amazon ECR**. No infrastructure changes.
+- **CD (Infrastructure Deployment):** Triggered manually via GitHub Actions, runs **Terraform plan**, requires approval, **applies changes**, and deploys **ECS**.
 
 ---
 
