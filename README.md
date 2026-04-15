@@ -47,7 +47,7 @@ Rather than focusing only on functionality, this project enforces production-sty
 
 ## Deployment 
 
-![alt text](cd_pipeline.png)
+![alt text](images/cd_pipeline.png)
 
 - `Bootstrap:` Creates core AWS resources for Terraform (`S3 state bucket, DynamoDB lock table, ECR repo, IAM OIDC roles`). One-time setup before any deployments.
 - `CI (Build & Publish):` Builds the Docker image, tags it with the Git commit SHA, and pushes it to `Amazon ECR`. No infrastructure changes.
