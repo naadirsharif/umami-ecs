@@ -45,6 +45,37 @@ Rather than focusing only on functionality, this project enforces production-sty
 
 ---
 
+## Deployment 
+
+![alt text](cd_pipeline.png)
+
+- `Bootstrap:` Creates core AWS resources for Terraform (`S3 state bucket, DynamoDB lock table, ECR repo, IAM OIDC roles`). One-time setup before any deployments.
+- `CI (Build & Publish):` Builds the Docker image, tags it with the Git commit SHA, and pushes it to `Amazon ECR`. No infrastructure changes.
+- `CD (Infrastructure Deployment):` Triggered manually via GitHub Actions, runs `Terraform plan`, requires approval, `applies changes`, and deploys `ECS`.
+
+---
+
+## Deployment Guide
+https://github.com/naadirsharif/umami-ecs/blob/main/deployment_guide.md
+
+---
+
+## Local Testing
+
+```bash 
+# Build container
+docker build -t umami:latest -f docker/Dockerfile .
+
+# Run locally
+docker run -p 3000:3000 \
+  -e DATABASE_URL=<database-url> \
+  umami:latest
+
+# Access app via browser
+http://localhost:3000
+```
+
+
 ## Repository structure
 
 ```text
@@ -87,17 +118,7 @@ umami-ecs/
 └── README.md
 ```
 
-## Local Testing
 
-```bash 
-# Build container
-docker build -t umami:latest -f docker/Dockerfile .
 
-# Run locally
-docker run -p 3000:3000 \
-  -e DATABASE_URL=<database-url> \
-  umami:latest
 
-# Access app via browser
-http://localhost:3000
-```
+
