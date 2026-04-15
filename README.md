@@ -45,7 +45,7 @@ Rather than focusing only on functionality, this project enforces production-sty
 
 ![alt text](images/umami-website-demo.gif)
 
-***Umami running on AWS ECS with HTTPS and the custom domain https://tm.nashar.dev.***
+***Umami running on AWS ECS with HTTPS via the custom domain https://tm.nashar.dev.***
 
 ---
 
