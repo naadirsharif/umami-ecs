@@ -15,6 +15,8 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 ## Architecture Diagram
 
+![alt text](images/ecs_diagram.drawio.png)
+
 ---
 
 ## Delivery Highlights
