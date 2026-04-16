@@ -1,0 +1,54 @@
+name: Destroy Terraform Infrastructure
+
+on:
+  workflow_dispatch:
+
+permissions: 
+  id-token: write
+  contents: read 
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+
+jobs:
+  destroy:  
+    name: Destroy Terraform
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v6.1.0
+          with:
+            role-to-assume: ${{ secrets.OIDC_ARN }}
+            aws-region: ${{ env.AWS_REGION }}
+
+        - name: terraform destroy
+          uses: dflook/terraform-destroy@v2
+          id: destroy
+
+          with:
+            path: infra/
+            auto_approve: true
+            parallelism: 1
+
+            # force destroy order
+            target: |
+              module.ecs
+              module.alb
+              module.acm
+              module.vpc
+              module.dns
+
+          env:
+            TF_VAR_db_string: ${{ secrets.DB_STRING }}
+            TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+            TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
+            TF_LOG: INFO 
+
+            
+
+
