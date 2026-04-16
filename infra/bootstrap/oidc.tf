@@ -1,4 +1,10 @@
-# GitHub OIDC Provider for AWS authentication via GitHub Actions
+# ------------------------------------------------------------
+# GitHub Actions IAM Permissions (OIDC)
+# Defines what GitHub Actions is allowed to do in AWS
+# ------------------------------------------------------------
+
+
+# OIDC provider for GitHub → enables keyless authentication
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -7,7 +13,7 @@ resource "aws_iam_openid_connect_provider" "github" {
   ]
 }
 
-# IAM role for GitHub Actions restricted to a specific repo for secure & keyless AWS access
+# IAM role assumed by GitHub Actions (restricted to a repository)
 resource "aws_iam_role" "github_actions" {
   name = var.oidc_iam_name
 
@@ -33,19 +39,52 @@ resource "aws_iam_role" "github_actions" {
   })
 }
 
-# Allow ECR Push for GitHub Actions
+
+
+
+# ECR access (build & push container images)
 resource "aws_iam_role_policy_attachment" "attach" {
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
-# Allows ECS Deployment for GitHub Actions
+# ECS access (services, tasks, clusters)
 resource "aws_iam_role_policy_attachment" "ecs" {
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }
 
-# Allow GitHub Actions to access Terraform state stored in S3
+# EC2 / VPC access (networking, subnets, SGs)
+resource "aws_iam_role_policy_attachment" "ec2" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+}
+
+# Load balancer access
+resource "aws_iam_role_policy_attachment" "elb" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
+}
+
+# Certificate management (TLS via ACM) access
+resource "aws_iam_role_policy_attachment" "acm" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess"
+}
+
+# Cloudwatch Logs access
+resource "aws_iam_role_policy_attachment" "logs" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+# Parameter store access (secrets via SSM)
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+}
+
+# Terraform state access (S3 backend)
 resource "aws_iam_policy" "terraform_state" {
   name = "terraform-state-access"
 
@@ -74,7 +113,8 @@ resource "aws_iam_role_policy_attachment" "terraform_state_attach" {
   policy_arn = aws_iam_policy.terraform_state.arn
 }
 
-# Allow access to dynamodb state locking to prevent simultaneous Terraform operations.
+
+# Terraform state locking access (DynamoDB)
 resource "aws_iam_policy" "terraform_dynamodb_lock" {
   name = "terraform-dynamodb-lock-access"
 
@@ -102,7 +142,7 @@ resource "aws_iam_role_policy_attachment" "terraform_dynamodb_attach" {
 }
 
 
-# Allow GitHub Actions to pass the ECS task role during deployment
+# Pass ECS task execution role to services (required for ECS deployments)
 resource "aws_iam_role_policy" "passrole" {
   name = "github-actions-passrole"
   role = aws_iam_role.github_actions.id
@@ -113,38 +153,8 @@ resource "aws_iam_role_policy" "passrole" {
       {
         Effect   = "Allow"
         Action   = "iam:PassRole"
-        Resource = "*"
+        Resource = "arn:aws:iam::${var.aws_account_id}:role/ecs_execution_role" # wil be created in root
       }
     ]
   })
-}
-
-resource "aws_iam_policy" "terraform_full_access" {
-  name = "terraform-full-access"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "acm:*",
-          "iam:*",
-          "ec2:*",
-          "vpc:*",
-          "ssm:*",
-          "logs:*",
-          "cloudwatch:*",
-          "route53:*",
-          "elasticloadbalancing:*"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "terraform_full_attach" {
-  role       = aws_iam_role.github_actions.name
-  policy_arn = aws_iam_policy.terraform_full_access.arn
 }

@@ -37,6 +37,10 @@ variable "github_repo" {
   description = "github repository in the format 'owner/repo' that is allowed to assume iam role via GitHub Actions OIDC"
 }
 
+variable "aws_account_id" {
+  description = "ID of your AWS Account"
+}
+
 #################################################################
 
 # S3
