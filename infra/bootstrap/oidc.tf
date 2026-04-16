@@ -159,7 +159,7 @@ resource "aws_iam_role_policy" "passrole" {
   })
 }
 
-# Allow GitHub Actions to create ECS roles
+# IAM role lifecycle permissions for GitHub Actions
 resource "aws_iam_role_policy" "iam_lifecycle" {
   name = "github-actions-ecs-iam"
   role = aws_iam_role.github_actions.id
@@ -170,18 +170,18 @@ resource "aws_iam_role_policy" "iam_lifecycle" {
       {
         Effect = "Allow"
         Action = [
-          "iam:CreateRole",
-          "iam:DeleteRole",
-          "iam:GetRole",
-          "iam:PassRole",
-          "iam:AttachRolePolicy",
-          "iam:DetachRolePolicy",
-          "iam:PutRolePolicy",
-          "iam:DeleteRolePolicy",
-          "iam:TagRole",
-          "iam:ListRolePolicies",
-          "iam:ListAttachedRolePolicies",
-          "iam:ListInstanceProfilesForRole"
+           "iam:CreateRole",
+           "iam:DeleteRole",
+           "iam:GetRole",
+           "iam:GetRolePolicy",             
+           "iam:AttachRolePolicy",
+           "iam:DetachRolePolicy",
+           "iam:PutRolePolicy",
+           "iam:DeleteRolePolicy",
+           "iam:TagRole",
+           "iam:ListRolePolicies",
+           "iam:ListAttachedRolePolicies",
+           "iam:ListInstanceProfilesForRole"
         ]
         Resource = "*"
       }
