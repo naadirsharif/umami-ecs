@@ -1,5 +1,9 @@
-# ECS IAM 
+# ------------------------------------------------------------
+# ECS IAM Roles
+# Defines permissions for ECS task execution and runtime access
+# ------------------------------------------------------------
 
+# Role used by ECS to run containers
 resource "aws_iam_role" "ecs_execution_role" {
   name = "ecs_execution_role"
 
@@ -15,11 +19,13 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 }
 
+# Required ECS execution permissions (ECR, logs, etc.)
 resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   role       = aws_iam_role.ecs_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# SSM access for secrets
 resource "aws_iam_role_policy" "ecs_ssm_access" {
   name = "ecs-ssm-access"
   role = aws_iam_role.ecs_execution_role.id
@@ -47,28 +53,7 @@ resource "aws_iam_role_policy" "ecs_ssm_access" {
   })
 }
 
-
-resource "aws_iam_role_policy" "ecs_exec_policy" {
-  name = "ecs-exec-policy"
-  role = aws_iam_role.ecs_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ssmmessages:CreateControlChannel",
-          "ssmmessages:CreateDataChannel",
-          "ssmmessages:OpenControlChannel",
-          "ssmmessages:OpenDataChannel"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
-
+# Task role (app permissions at runtime)
 resource "aws_iam_role" "ecs_task_role" {
   name = "ecs_task_role"
 
