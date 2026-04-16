@@ -183,3 +183,24 @@ resource "aws_iam_role_policy" "ecs_iam_create" {
     ]
   })
 }
+
+# IAM read access for ECS role management
+resource "aws_iam_role_policy" "ecs_iam_read" {
+  name = "github-actions-ecs-iam-read"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:GetRole",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
