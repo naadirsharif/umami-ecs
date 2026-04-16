@@ -158,3 +158,28 @@ resource "aws_iam_role_policy" "passrole" {
     ]
   })
 }
+
+# Allow GitHub Actions to create ECS roles
+resource "aws_iam_role_policy" "ecs_iam_create" {
+  name = "github-actions-ecs-iam"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:TagRole"
+        ]
+        Resource = "arn:aws:iam::${var.aws_account_id}:role/ecs_*"
+      }
+    ]
+  })
+}
