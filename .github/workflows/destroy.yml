@@ -35,7 +35,7 @@ jobs:
             auto_approve: true
             parallelism: 1
 
-            # force destroy order
+            # target destroy for critical modules
             target: |
               module.ecs
               module.alb
