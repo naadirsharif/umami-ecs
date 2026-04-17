@@ -169,19 +169,6 @@ permissions:
   contents: read
 ```
 
-Terraform automatically creates a `DNS record`:
-```hcl
-resource "cloudflare_dns_record" "alb_dns_record" {
-  zone_id = var.zone_id_cloudflare
-  name    = var.subdomain_name
-  ttl     = 1
-  type    = "CNAME"
-  content = var.alb_dns
-  proxied = false
-```
-
--> Traffic is routed to ALB.
-
 ---
 
 ## 7. Deployment Flow
@@ -218,19 +205,19 @@ https://tm.nashar.dev
 
 ## 9. Common Issues
 
-### ECR not found
+#### ECR not found
 
 → bootstrap not executed or wrong region
 
-### Terraform backend error
+#### Terraform backend error
 
 → wrong S3 bucket / region mismatch
 
-### ALB not reachable
+#### ALB not reachable
 
 → DNS propagation delay or wrong Cloudflare config
 
-### ECS not starting
+#### ECS not starting
 
 → check logs (CloudWatch) and environment variables
 
