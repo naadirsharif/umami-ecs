@@ -111,8 +111,10 @@ umami-ecs/
 │ 
 │── .github/
 │   └── workflows/
-│       ├── build.yml       
-│       └── deploy.yml   
+│       ├── build.yml     # Build and Push Image to AWS ECR (CI)  
+│       ├── deploy.yml    # Terraform Infra & ECS Deployment (CD)
+│       └── destroy.yml   # Manual teardown: Terraform destroy (infra cleanup)
+│
 │
 ├── app/                    
 │   ├── src/
@@ -121,28 +123,28 @@ umami-ecs/
 │   └── ...  
 │
 ├── docker/
-│   ├── Dockerfile
+│   ├── Dockerfile        # Multi-stage build (optimized image)
 │   └── .dockerignore
 │       
 ├── infra/
-│   ├── bootstrap/
+│   ├── bootstrap/        # One-time setup: S3 state, DynamoDB lock, ECR, OIDC
 │   │   ├── ecr.tf
 │   │   ├── s3.tf
 │   │   ├── oidc.tf
 │   │   └── ...
 │   │
-│   ├── main.tf
+│   ├── main.tf           # infrastructure entry point
 │   ├── variables.tf
 │   ├── outputs.tf
 │   ├── terraform.tfvars
-│   └── modules/
+│   └── modules/          # Modular infrastructure (VPC, ECS, ALB, DNS, ACM)
 │       ├── vpc
 │       ├── alb
 │       ├── ecs
 │       ├── dns
 │       └── acm             
 │   
-├── deployment_guide.md
+├── deployment_guide.md   # Full deployment & teardown guide
 └── README.md
 ```
 
