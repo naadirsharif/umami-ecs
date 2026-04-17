@@ -1,5 +1,5 @@
 # Umami ECS Deployment Project 
-Production-grade deployment of a self-hosted analytics platform using modular Terraform, AWS ECS Fargate, and GitHub Actions CI/CD.
+Production-grade deployment of a self-hosted analytics platform using Docker, modular Terraform, AWS ECS Fargate, and GitHub Actions CI/CD.
 
 ---
 
@@ -7,9 +7,9 @@ Production-grade deployment of a self-hosted analytics platform using modular Te
 The goal of this project is not just to run Umami, but to simulate how a production system is deployed in a real cloud environment.
 
 - reproducible infrastructure as code
-- secure-by-default architecture
+- security-aware architecture with production best practices
 - fully automated deployments
-- separation of CI (build) and CD (infrastructure)
+- separation of CI (build) and CD (deploy)
   
 ---
 
@@ -51,7 +51,7 @@ Rather than focusing only on functionality, this project contains production-sty
 
 ![alt text](images/umami-website-demo.gif)
 
-***Umami running on AWS ECS with HTTPS via the custom domain https://tm.nashar.dev.***
+*Umami running on AWS ECS with HTTPS via the custom domain https://tm.nashar.dev.*
 
 ---
 
