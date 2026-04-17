@@ -12,8 +12,9 @@ This guide explains how to deploy this application using:
 ## 1. Prerequisites
 
 You need:
-- AWS account with permissions for: ECS / ECR, IAM, S3, DynamoDB, ALB, ACM 
-- Domain managed via Cloudflare (DNS is automated via Terraform)
+- AWS account with permissions for: ECS / ECR, IAM, S3, DynamoDB, ALB, ACM, SSM
+- Domain managed via Cloudflare + API Token (DNS is automated via Terraform) 
+- PostgreSQL database (e.g. Neon, RDS, Supabase) with connection string
 - Docker (optional for local testing)
 - Terraform (for bootstrap only)
 
@@ -37,6 +38,11 @@ terraform apply
 
 After running `terraform apply`, Terraform will prompt for required variables:
 ```bash
+var.aws_account_id
+  ID of your AWS Account
+
+  Enter a value: 512346721367
+
 var.region
   AWS Region
 
@@ -57,7 +63,7 @@ Outputs (save these!)
 
 ## 3. Configure Terraform Backend
 
-The Terraform backend is configured in `provider.tf` using an S3 backend block.
+The Terraform backend is configured in `provider.tf` in the root, using an S3 backend block.
 
 ```hcl
 backend "s3" {
@@ -227,6 +233,21 @@ https://tm.nashar.dev
 ### ECS not starting
 
 → check logs (CloudWatch) and environment variables
+
+---
+
+## 10. Destroy Infrastructure (Cleanup)
+
+Infrastructure can be destroyed using the destroy.yml GitHub Actions workflow:
+
+→ Go to **Actions → "Destroy Terraform Infrastructure" → Run workflow**
+
+### ⚠️
+
+- This will delete all infrastructure managed by the main Terraform stack (ECS, ALB, VPC, etc.)
+- Bootstrap resources (S3 state bucket, DynamoDB lock table, ECR repository, OIDC rules) are NOT deleted -> 
+- Container images stored in ECR are preserved
+- The workflow requires manual confirmation before execution
 
 ---
 
