@@ -4,12 +4,12 @@ Production-grade deployment of a self-hosted analytics platform using Docker, mo
 ---
 
 ## Why this project matters
-The goal of this project is not just to run Umami, but to simulate how a production system is deployed in a real cloud environment.
+The goal of this project is not just to run Umami, but to simulate how a production system is deployed in a real cloud environment, focusing on:
 
-- reproducible infrastructure as code
-- security-aware architecture with production best practices
-- fully automated deployments
-- separation of CI (build) and CD (deploy)
+- **reproducible and modular** infrastructure as code
+- **security-aware** architecture with production best practices
+- **end-to-end infrastructure lifecycle management** (build, deploy, destroy)
+- **automated build and deployment workflows**
   
 ---
 
@@ -21,10 +21,11 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 ## Delivery Highlights
 
-- Docker image size: **2.1GB → ~134MB (~94% reduction)** via multi-stage builds
-- ~2h manual AWS setup → ~10min automated deployment (reduced deployment time by **~92%**)
+- **~94% Docker image size reduction** (**2.1GB → ~134MB) via multi-stage builds
+- **reduced deployment time by ~92%** (~2h manual AWS setup → ~10min automated deployment)
 - Terraform quality gates via **fmt + validate** (CI/CD pipeline checks)
 - AWS authentication fully migrated to GitHub **OIDC**
+
 
 ---
 
@@ -72,8 +73,12 @@ It provides essential analytics while keeping full control over your data.
 ![alt text](images/cd_pipeline.png)
 
 - **Bootstrap:** Creates core AWS resources for Terraform (**S3 state bucket, DynamoDB lock table, ECR repo, IAM OIDC roles**). One-time setup before any deployments.
+
 - **CI (Build & Publish):** Builds the Docker image, tags it with the Git commit SHA, and pushes it to **Amazon ECR**. No infrastructure changes.
+
 - **CD (Infrastructure Deployment):** Triggered manually via GitHub Actions, runs **Terraform plan**, requires approval, **applies changes**, and deploys **ECS**.
+
+- **Destroy (Infrastructure Cleanup):** Triggered manually via GitHub Actions, runs Terraform destroy to **remove all infrastructure** managed by the main stack
 
 ---
 
