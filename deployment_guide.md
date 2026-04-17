@@ -245,7 +245,7 @@ Infrastructure can be destroyed using the destroy.yml GitHub Actions workflow:
 ### ⚠️
 
 - This will delete all infrastructure managed by the main Terraform stack (ECS, ALB, VPC, etc.)
-- Bootstrap resources (S3 state bucket, DynamoDB lock table, ECR repository, OIDC rules) are NOT deleted -> 
+- Bootstrap resources (S3 state bucket, DynamoDB lock table, ECR repository, OIDC rules) are NOT deleted 
 - Container images stored in ECR are preserved
 - The workflow requires manual confirmation before execution
 
