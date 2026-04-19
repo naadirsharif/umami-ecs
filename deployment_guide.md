@@ -225,6 +225,12 @@ https://tm.nashar.dev
 
 ## 10. Destroy Infrastructure (Cleanup)
 
+**Before Destroying**, make sure the following points are met:
+1. Scale ECS service to 0
+2. Wait for tasks to drain
+3. Ensure Target Groups are empty
+4. Destroy Terraform infrastructure
+
 Infrastructure can be destroyed using the destroy.yml GitHub Actions workflow:
 
 → Go to **Actions → "Destroy Terraform Infrastructure" → Run workflow**
