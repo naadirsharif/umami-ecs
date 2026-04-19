@@ -7,6 +7,7 @@ permissions:
   id-token: write
   contents: read 
 
+
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
 
@@ -15,6 +16,9 @@ jobs:
     name: Destroy Terraform
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    defaults:
+      run: 
+        working-directory: infra/
 
     steps:
         - name: Checkout code
@@ -26,14 +30,14 @@ jobs:
             role-to-assume: ${{ secrets.OIDC_ARN }}
             aws-region: ${{ env.AWS_REGION }}
 
-        - name: terraform destroy
-          uses: dflook/terraform-destroy@v2
-          id: destroy
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
 
-          with:
-            path: infra/
-            auto_approve: false
-            parallelism: 1
+        - name: Terraform Init
+          run: terraform init -reconfigure
+
+        - name: Terraform Destroy
+          run: terraform destroy -auto-approve
 
           env:
             TF_VAR_db_string: ${{ secrets.DB_STRING }}
