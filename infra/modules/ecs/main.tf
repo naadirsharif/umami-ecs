@@ -89,6 +89,12 @@ resource "aws_ecs_service" "main" {
   launch_type            = "FARGATE"
   enable_execute_command = true
 
+  # Prevents broken deployments
+   deployment_circuit_breaker {
+    enable   = true
+    rollback = true 
+  }
+
   network_configuration {
     subnets = var.private_subnet_ids
 
