@@ -90,9 +90,9 @@ resource "aws_ecs_service" "main" {
   enable_execute_command = true
 
   # Prevents broken deployments
-   deployment_circuit_breaker {
+  deployment_circuit_breaker {
     enable   = true
-    rollback = true 
+    rollback = true
   }
 
   network_configuration {

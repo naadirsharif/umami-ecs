@@ -170,18 +170,18 @@ resource "aws_iam_role_policy" "iam_lifecycle" {
       {
         Effect = "Allow"
         Action = [
-           "iam:CreateRole",
-           "iam:DeleteRole",
-           "iam:GetRole",
-           "iam:GetRolePolicy",             
-           "iam:AttachRolePolicy",
-           "iam:DetachRolePolicy",
-           "iam:PutRolePolicy",
-           "iam:DeleteRolePolicy",
-           "iam:TagRole",
-           "iam:ListRolePolicies",
-           "iam:ListAttachedRolePolicies",
-           "iam:ListInstanceProfilesForRole"
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:GetRole",
+          "iam:GetRolePolicy",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:TagRole",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies",
+          "iam:ListInstanceProfilesForRole"
         ]
         Resource = "*"
       }
