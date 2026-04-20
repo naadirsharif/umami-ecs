@@ -46,12 +46,21 @@ jobs:
         run: |
           docker buildx build \
           --platform linux/amd64 \
+          --load \
           --build-arg DATABASE_URL="$DATABASE_URL" \
           -f docker/Dockerfile \
           -t "${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}" \
           .
 
           echo "image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Trivy scan (security check)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: "${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+          format: table
+          exit-code: 1
+          severity: CRITICAL,HIGH
         
 
       - name: Push Docker image to ECR
