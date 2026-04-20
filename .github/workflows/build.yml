@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths: 
       - "docker/**"
+      - "app/**"
 
 permissions:
   id-token: write
