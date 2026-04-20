@@ -1,24 +1,28 @@
 name: Terraform Infra & ECS Deployment (CD)
 
-on: 
-  workflow_dispatch:
+on:
+  workflow_run:
+    workflows: ["Build and Push Image to AWS ECR (CI)"]
+    types:
+      - completed
 
 permissions:
   id-token: write
   contents: read
 
-env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
-
-  TF_VAR_db_string: ${{ secrets.DB_STRING }}
-  TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-  TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
-
 jobs:
   plan:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    name: Terraform plan
-    
+
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VAR_image_tag: ${{ github.event.workflow_run.head_sha }}
+      TF_VAR_ecr_url: ${{ vars.ECR_URL }}
+      TF_VAR_db_string: ${{ secrets.DB_STRING }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,34 +33,31 @@ jobs:
           role-to-assume: ${{ secrets.OIDC_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-
-      - name: terraform fmt (lint code)
+      - name: terraform fmt (format)
         uses: dflook/terraform-fmt-check@v2
         with:
           path: infra/
-
 
       - name: terraform validate
         uses: dflook/terraform-validate@v2
         with:
           path: infra/
 
+      - name: Run Checkov (Security Scan)
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: infra/
+          framework: terraform
+          soft_fail: false
 
       - name: terraform plan
-        env:
-          TF_VAR_db_string: ${{ secrets.DB_STRING }}
-          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
         uses: dflook/terraform-plan@v2
         with:
           path: infra/
 
-
   apply:
     runs-on: ubuntu-latest
-    name: Terraform apply
     needs: plan
-
     environment:
       name: production
 
@@ -68,7 +69,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
           role-to-assume: ${{ secrets.OIDC_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: terraform apply
         uses: dflook/terraform-apply@v2

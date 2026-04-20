@@ -149,6 +149,14 @@ variable "container_port" {
   type        = number
 }
 
+variable "ecr_url" {
+  type = string
+}
+
+variable "image_tag" {
+  type = string
+}
+
 #################################################################
 
 # ACM variables
