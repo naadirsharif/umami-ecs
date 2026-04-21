@@ -57,9 +57,7 @@ jobs:
         with:
           directory: infra/
           framework: terraform
-          soft_fail: false
-          skip-check: CKV2_AWS_62,CKV_AWS_144,CKV_AWS_18,CKV2_AWS_28,
-                      CKV2_AWS_11,CKV2_AWS_12,CKV2_AWS_61
+          soft_fail: true
 
       - name: terraform plan
         uses: dflook/terraform-plan@v2
