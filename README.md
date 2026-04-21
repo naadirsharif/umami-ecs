@@ -23,7 +23,7 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 - **~94% Docker image size reduction** (2.1GB → ~134MB) via multi-stage builds
 - **reduced deployment time by ~92%** (~2h manual AWS setup → ~10min automated deployment)
-- Terraform quality gates via **fmt + validate** (CI/CD pipeline checks)
+- Terraform **quality & security checks** in CI/CD (**fmt + validate + Trivy +Checkov**)
 - AWS authentication fully migrated to GitHub **OIDC**
 
 
@@ -44,7 +44,8 @@ Rather than focusing only on functionality, this project contains production-sty
 - **OIDC Authentication:** GitHub Actions uses OIDC (no static AWS credentials)
 - **State Isolation:** Terraform state is stored in S3 with DynamoDB locking
 - **Immutable Images:** Docker images are versioned using Git SHA tags only
-- **Protected Deployments:** Production changes require manual approval via GitHub Environments
+- **CI/CD Security Gates:** Automated infra and image scanning (Checkov, Trivy) 
+- **Manual Approval Gate:** Production deployments require reviewer approval before Terraform apply 
 
 ---
 
@@ -70,15 +71,17 @@ It provides essential analytics while keeping full control over your data.
 
 ## Deployment 
 
+![alt text](images/ci_pipeline.png)
+
 ![alt text](images/cd_pipeline.png)
 
 - **Bootstrap:** Creates core AWS resources for Terraform (**S3 state bucket, DynamoDB lock table, ECR repo, IAM OIDC roles**). One-time setup before any deployments.
 
-- **CI (Build & Publish):** Builds the Docker image, tags it with the Git commit SHA, and pushes it to **Amazon ECR**. No infrastructure changes.
+- **CI (Build & Publish):** Builds the Docker image, tags it with the Git commit SHA, and pushes it to **Amazon ECR**.
 
-- **CD (Infrastructure Deployment):** Triggered manually via GitHub Actions, runs **Terraform plan**, requires approval, **applies changes**, and deploys **ECS**.
+- **CD (Infrastructure Deployment):** Automatically triggered **after CI success** via GitHub Actions. Runs **Terraform plan**, requires manual approval, **applies changes**, and **deploys ECS**.
 
-- **Destroy (Infrastructure Cleanup):** Triggered manually via GitHub Actions, runs Terraform destroy to **remove all infrastructure** managed by the main stack
+- **Destroy (Infrastructure Cleanup):** Triggered manually via GitHub Actions, runs Terraform destroy to **remove all infrastructure** managed by the main stack.
 
 ---
 
