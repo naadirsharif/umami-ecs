@@ -23,7 +23,7 @@ The goal of this project is not just to run Umami, but to simulate how a product
 
 - **~94% Docker image size reduction** (2.1GB → ~134MB) via multi-stage builds
 - **reduced deployment time by ~92%** (~2h manual AWS setup → ~10min automated deployment)
-- Terraform **quality & security checks** in CI/CD (**fmt + validate + Trivy +Checkov**)
+- Terraform **quality & security checks** in CI/CD (**fmt + validate + Trivy + Checkov**)
 - AWS authentication fully migrated to GitHub **OIDC**
 
 
@@ -71,8 +71,10 @@ It provides essential analytics while keeping full control over your data.
 
 ## Deployment 
 
+### Build and Push Image to AWS ECR (CI)
 ![alt text](images/ci_pipeline.png)
 
+### Terraform Infra & ECS Deployment (CD)
 ![alt text](images/cd_pipeline.png)
 
 - **Bootstrap:** Creates core AWS resources for Terraform (**S3 state bucket, DynamoDB lock table, ECR repo, IAM OIDC roles**). One-time setup before any deployments.
