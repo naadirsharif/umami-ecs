@@ -26,9 +26,7 @@ jobs:
 
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
-
       TF_VAR_app_image: "${{ vars.ECR_URL }}:${{ github.event.inputs.image_tag || github.event.workflow_run.head_sha }}"
-      
       TF_VAR_db_string: ${{ secrets.DB_STRING }}
       TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
@@ -70,6 +68,13 @@ jobs:
     needs: plan
     environment:
       name: production
+
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VAR_app_image: "${{ vars.ECR_URL }}:${{ github.event.inputs.image_tag || github.event.workflow_run.head_sha }}"
+      TF_VAR_db_string: ${{ secrets.DB_STRING }}
+      TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TF_VAR_zone_id_cloudflare: ${{ secrets.ZONE_ID_CLOUDFLARE }}
 
     steps:
       - name: Checkout code
