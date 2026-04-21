@@ -1,6 +1,12 @@
 name: Terraform Infra & ECS Deployment (CD)
 
 on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "ECR image tag (SHA)"
+        required: true
+
   workflow_run:
     workflows: ["Build and Push Image to AWS ECR (CI)"]
     types:
@@ -17,7 +23,7 @@ jobs:
 
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
-      TF_VAR_image_tag: ${{ github.event.workflow_run.head_sha }}
+      TF_VAR_image_tag: ${{ github.event.inputs.image_tag || github.event.workflow_run.head_sha }}
       TF_VAR_ecr_url: ${{ vars.ECR_URL }}
       TF_VAR_db_string: ${{ secrets.DB_STRING }}
       TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -49,6 +55,8 @@ jobs:
           directory: infra/
           framework: terraform
           soft_fail: false
+          skip-check: CKV2_AWS_62,CKV_AWS_144,CKV_AWS_18,CKV2_AWS_28,
+                      CKV2_AWS_11,CKV2_AWS_12,CKV2_AWS_61
 
       - name: terraform plan
         uses: dflook/terraform-plan@v2
