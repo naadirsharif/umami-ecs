@@ -117,7 +117,6 @@ variable "cluster_name" {
 }
 
 variable "app_image" {
-  description = " dummy docker image"
   type        = string
 }
 
@@ -147,10 +146,6 @@ variable "ecs_sg_description" {
 variable "container_port" {
   description = "internal port of container"
   type        = number
-}
-
-variable "app_image" {
-  type = string
 }
 
 #################################################################
