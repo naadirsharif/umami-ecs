@@ -4,10 +4,12 @@ region = "<YOUR_REGION>"
 # Health Check
 health_path = "/src/app/api/heartbeat"
 
-# ECS 
+# ECS Task
 app_image      = "<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<ECR_REPO_NAME>:<IMAGE_TAG_OR_SHA>"
 desired_count  = 3 # Desired number of ECS tasks 
 container_port = 3000
+container_cpu    = 1024
+container_memory = 2048
 
 # Domain 
 domain_name    = "<YOUR_DOMAIN>"

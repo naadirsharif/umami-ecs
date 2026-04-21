@@ -148,6 +148,14 @@ variable "container_port" {
   type        = number
 }
 
+variable "container_cpu" {
+  type = number
+}
+
+variable "container_memory" {
+  type = number
+}
+
 #################################################################
 
 # ACM variables

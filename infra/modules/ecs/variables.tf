@@ -56,6 +56,13 @@ variable "app_image" {
   type        = string
 }
 
+variable "container_cpu" {
+  type = number
+}
+
+variable "container_memory" {
+  type = number
+}
 
 # IAM 
 variable "ecs_iam_name" {

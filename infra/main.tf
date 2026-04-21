@@ -34,6 +34,8 @@ module "ecs" {
   tags               = var.tags
   container_port     = var.container_port
   app_image          = var.app_image
+  container_cpu      = var.container_cpu
+  container_memory   = var.container_memory
   cluster_name       = var.cluster_name
   desired_count      = var.desired_count
   alb_sg_id          = module.alb.alb_sg_id

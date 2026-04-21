@@ -33,8 +33,8 @@ resource "aws_ecs_task_definition" "main" {
   {
     "name": "umami-ecs",
     "image": "${var.app_image}",
-    "cpu": 1024,
-    "memory": 2048,
+    "cpu": ${var.container_cpu},
+    "memory": ${var.container_memory},
     "essential": true,
 
     "environment": [
