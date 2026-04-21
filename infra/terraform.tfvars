@@ -6,7 +6,7 @@ health_path = "/src/app/api/heartbeat"
 
 # ECS 
 app_image      = "nginx:latest" # dummy image (only local dev)
-desired_count  = 1 # Desired number of ECS tasks 
+desired_count  = 1              # Desired number of ECS tasks 
 container_port = 3000
 
 # Domain 
