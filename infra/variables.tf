@@ -117,7 +117,7 @@ variable "cluster_name" {
 }
 
 variable "app_image" {
-  type        = string
+  type = string
 }
 
 variable "db_string" {
