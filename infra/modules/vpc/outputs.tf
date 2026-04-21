@@ -7,17 +7,16 @@ output "vpc_id" {
 output "public_subnet_ids" {
   description = "ID of all public subnets"
   value = [
-    aws_subnet.public-eu-central-1a.id,
-    aws_subnet.public-eu-central-1b.id,
-    aws_subnet.public-eu-central-1c.id
+    for subnet in aws_subnet.public :
+    subnet.id
   ]
 }
+
 output "private_subnet_ids" {
   description = "ID of all private subnets"
   value = [
-    aws_subnet.private-eu-central-1a.id,
-    aws_subnet.private-eu-central-1b.id,
-    aws_subnet.private-eu-central-1c.id
+    for subnet in aws_subnet.private :
+    subnet.id
   ]
 }
 

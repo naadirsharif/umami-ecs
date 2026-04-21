@@ -3,8 +3,7 @@ variable "tags" {
 }
 
 variable "availability_zones" {
-  description = "availability zones 1a-1c"
-  type        = list(string)
+  type        = map(string)
 }
 
 variable "cidr_vpc" {
@@ -13,13 +12,11 @@ variable "cidr_vpc" {
 }
 
 variable "cidrs_public_subnet" {
-  description = "CIDR blocks of public subnets"
-  type        = list(string)
+  type = map(string)
 }
 
 variable "cidrs_private_subnet" {
-  description = "CIDR blocks of private subnets"
-  type        = list(string)
+  type = map(string)
 }
 
 variable "nat_connectivity_type" {

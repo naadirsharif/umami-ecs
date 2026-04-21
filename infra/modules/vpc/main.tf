@@ -7,48 +7,27 @@ resource "aws_vpc" "umami-vpc" {
 }
 
 ## Public Subnets
-resource "aws_subnet" "public-eu-central-1a" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[0]
-  cidr_block        = var.cidrs_public_subnet[0]
-  tags              = var.tags
-}
+resource "aws_subnet" "public" {
+  for_each = var.cidrs_public_subnet
 
-resource "aws_subnet" "public-eu-central-1b" {
   vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[1]
-  cidr_block        = var.cidrs_public_subnet[1]
-  tags              = var.tags
-}
+  availability_zone = var.availability_zones[each.key]
+  cidr_block        = each.value
 
-resource "aws_subnet" "public-eu-central-1c" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[2]
-  cidr_block        = var.cidrs_public_subnet[2]
-  tags              = var.tags
+  tags = var.tags
 }
 
 ## Private Subnets
-resource "aws_subnet" "private-eu-central-1a" {
+resource "aws_subnet" "private" {
+  for_each = var.cidrs_private_subnet
+
   vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[0]
-  cidr_block        = var.cidrs_private_subnet[0]
+  availability_zone = var.availability_zones[each.key]
+  cidr_block        = each.value
+
   tags              = var.tags
 }
 
-resource "aws_subnet" "private-eu-central-1b" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[1]
-  cidr_block        = var.cidrs_private_subnet[1]
-  tags              = var.tags
-}
-
-resource "aws_subnet" "private-eu-central-1c" {
-  vpc_id            = aws_vpc.umami-vpc.id
-  availability_zone = var.availability_zones[2]
-  cidr_block        = var.cidrs_private_subnet[2]
-  tags              = var.tags
-}
 
 ## IGW and NGW
 resource "aws_internet_gateway" "umami-igw" {
@@ -75,17 +54,9 @@ resource "aws_route_table" "public" {
 }
 
 ## Public Route Table Assocications
-resource "aws_route_table_association" "public_eu_central_1a" {
-  subnet_id      = aws_subnet.public-eu-central-1a.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "public_eu_central_1b" {
-  subnet_id      = aws_subnet.public-eu-central-1b.id
-  route_table_id = aws_route_table.public.id
-}
-resource "aws_route_table_association" "public_eu_central_1c" {
-  subnet_id      = aws_subnet.public-eu-central-1c.id
+resource "aws_route_table_association" "public" {
+  for_each = aws_subnet.public
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.public.id
 }
 
@@ -101,18 +72,10 @@ resource "aws_route_table" "private" {
 }
 
 ## Private Route Table Assocications
-resource "aws_route_table_association" "private_eu_central_1a" {
-  subnet_id      = aws_subnet.private-eu-central-1a.id
-  route_table_id = aws_route_table.private.id
-}
+resource "aws_route_table_association" "private" {
+  for_each = aws_subnet.private
 
-resource "aws_route_table_association" "private_eu_central_1b" {
-  subnet_id      = aws_subnet.private-eu-central-1b.id
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.private.id
 }
-resource "aws_route_table_association" "private_eu_central_1c" {
-  subnet_id      = aws_subnet.private-eu-central-1c.id
-  route_table_id = aws_route_table.private.id
-}
-
 

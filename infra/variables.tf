@@ -6,7 +6,7 @@ variable "tags" {
   type = map(string)
   default = {
     Project     = "umami"
-    Environment = "dev"
+    Environment = "prod"
   }
 }
 
@@ -19,13 +19,12 @@ variable "region" {
 # VPC Variables 
 
 variable "availability_zones" {
-  description = "availability zones 1a-1c"
-  type        = list(string)
-  default = [
-    "eu-central-1a",
-    "eu-central-1b",
-    "eu-central-1c"
-  ]
+  type        = map(string)
+  default = {
+    a = "eu-central-1a"
+    b = "eu-central-1b"
+    c = "eu-central-1c"
+  }
 }
 
 variable "cidr_vpc" {
@@ -36,22 +35,22 @@ variable "cidr_vpc" {
 
 variable "cidrs_public_subnet" {
   description = "CIDR blocks of public subnets"
-  type        = list(string)
-  default = [
-    "10.0.1.0/24",
-    "10.0.2.0/24",
-    "10.0.3.0/24"
-  ]
+  type = map(string)
+  default = {
+    a = "10.0.1.0/24"
+    b = "10.0.2.0/24"
+    c = "10.0.3.0/24"
+  }
 }
 
 variable "cidrs_private_subnet" {
   description = "CIDR blocks of private subnets"
-  type        = list(string)
-  default = [
-    "10.0.4.0/24",
-    "10.0.5.0/24",
-    "10.0.6.0/24"
-  ]
+  type        = map(string)
+  default = {
+    a = "10.0.4.0/24"
+    b = "10.0.5.0/24"
+    c = "10.0.6.0/24"
+  }
 }
 
 #################################################################
