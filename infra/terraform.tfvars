@@ -5,7 +5,7 @@ region = "eu-central-1"
 health_path = "/src/app/api/heartbeat"
 
 # ECS 
-app_image      = "${var.ecr_url}:${var.image_tag}"
+app_image      = "nginx:latest" # dummy image (only local dev)
 desired_count  = 1 # Desired number of ECS tasks 
 container_port = 3000
 

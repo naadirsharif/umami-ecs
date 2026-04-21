@@ -149,11 +149,7 @@ variable "container_port" {
   type        = number
 }
 
-variable "ecr_url" {
-  type = string
-}
-
-variable "image_tag" {
+variable "app_image" {
   type = string
 }
 
