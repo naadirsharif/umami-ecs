@@ -15,8 +15,8 @@ You need:
 - AWS account with permissions for: ECS / ECR, IAM, S3, DynamoDB, ALB, ACM, SSM
 - Domain managed via Cloudflare + API Token (DNS is automated via Terraform) 
 - PostgreSQL database (e.g. Neon, RDS, Supabase) with connection string
-- Docker (optional for local testing)
 - Terraform (for bootstrap only)
+- Docker (optional for local testing)
 
 ---
 
@@ -75,11 +75,47 @@ backend "s3" {
 }
 ```
 
-⚠️ Region must match bootstrap.
+**Important:** Region must match bootstrap.
 
 ---
 
-## 4. CI Pipeline (Build & Push Docker Image)
+## 4. Prepare Terraform Variables
+
+Copy the following template:
+```bash
+cp infra/terraform.tfvars.template infra/terraform.tfvars
+```
+
+### Minimal example
+```hcl
+# Region
+region = "eu-central-1"
+
+# Health Check
+health_path = "/src/app/api/heartbeat"
+
+# ECS
+app_image        = "nginx:latest" # dummy (only used for local testing)
+desired_count    = 3
+container_port   = 3000
+container_cpu    = 1024
+container_memory = 2048
+
+# Domain
+domain_name    = "nashar.dev"
+subdomain_name = "tm"
+
+acm_validation_method = "DNS"
+```
+
+### Important
+
+- app_image is overwritten automatically in CI/CD
+- Actual image comes from ECR (tagged with Git SHA)
+
+---
+
+## 5. CI Pipeline (Build & Push Docker Image)
 
 Workflow builds and pushes image to ECR.
 
@@ -101,46 +137,18 @@ Workflow builds and pushes image to ECR.
 - tags with GITHUB_SHA
 - pushes to ECR
 
--> No dummy image needed anymore ✔
-
----
-
-## 5. Prepare Terraform Variables
-
-Copy the following template:
-```bash
-cp infra/terraform.tfvars.template infra/terraform.tfvars
-```
-
-### Minimal example
-```hcl
-# Region
-region = "eu-central-1"
-
-# Health Check
-health_path = "/src/app/api/heartbeat"
-
-# ECS
-app_image      = "530193444530.dkr.ecr.eu-central-1.amazonaws.com/umami-repo:<IMAGE_TAG>"
-desired_count  = 3   # Desired number of ECS tasks 
-container_port = 3000
-
-# Domain
-domain_name    = "nashar.dev"
-subdomain_name = "tm"
-
-acm_validation_method = "DNS"
-```
-
-### Important
-
-- ✔ Use immutable image tags (Git SHA)
-- ❌ Never use latest
-
 ---
 
 ## 6. CD Pipeline (Terraform Deployment)
 
+The CD pipeline is **automatically triggered** after a successful CI run.
+
+### What happens:
+- CI builds & pushes Docker image to ECR (tagged with commit SHA)
+- CD receives this image tag automatically
+- Terraform is executed using this image via: TF_VAR_app_image
+
+  TF_VAR_app_image
 `Workflow:`
 - terraform fmt
 - terraform validate
@@ -161,13 +169,6 @@ Deployments to production require manual approval via GitHub Environments (requi
 - DB_STRING
 - CLOUDFLARE_API_TOKEN
 - ZONE_ID_CLOUDFLARE
-
-Allow GitHub Actions to generate an `OIDC token`
-```yaml
-permissions:
-  id-token: write
-  contents: read
-```
 
 ---
 
@@ -200,6 +201,15 @@ https://<subdomain>.<domain>
 ```text
 https://tm.nashar.dev
 ```
+
+---
+
+### Manual Deployment / Rollback
+
+You can also manually trigger the CD pipeline via:
+**GitHub Actions → Run workflow** (workflow_dispatch)
+
+This allows you to perform **rollbacks** using a previous image tag (Git SHA)
 
 ---
 
