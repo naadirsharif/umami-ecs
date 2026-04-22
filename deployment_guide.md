@@ -194,7 +194,7 @@ https://tm.nashar.dev
 
 ---
 
-## 9. Common Issues
+## 8. Common Issues
 
 #### ECR not found
 
@@ -214,7 +214,7 @@ https://tm.nashar.dev
 
 ---
 
-## 10. Destroy Infrastructure (Cleanup)
+## 9. Destroy Infrastructure (Cleanup)
 
 **Before Destroying**, make sure the following points are met:
 1. Scale ECS service to 0
