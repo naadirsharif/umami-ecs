@@ -54,7 +54,7 @@ var.github_repo
   Enter a value: naadirsharif/umami-ecs
 ```
 
-Outputs (save these!)
+Outputs (save these for later configurations!)
 - state_bucket
 - ecr_repo_url
 - oidc_role_arn
@@ -117,80 +117,70 @@ acm_validation_method = "DNS"
 
 ## 5. CI Pipeline (Build & Push Docker Image)
 
-Workflow builds and pushes image to ECR.
+Builds and publishes the Docker image to Amazon ECR.
 
 ### Trigger
-- push to main
-- changes in docker/**
+- push to `main` (changes in `app/` or `docker/`)
+- manual (`workflow_dispatch`)
 
 ### Required GitHub Settings
 
-`Variables:`
+**Variables**
 - AWS_REGION
 - ECR_REPOSITORY
 
-`Secrets:`
+**Secrets**
 - OIDC_ARN
 
-`Behavior:`
-- builds Docker image
-- tags with GITHUB_SHA
-- pushes to ECR
+### Behavior
+- builds Docker image (multi-stage)
+- tags image with immutable `GITHUB_SHA`
+- runs **Trivy security scan** (fails on critical vulnerabilities)
+- pushes image to Amazon ECR
 
 ---
 
 ## 6. CD Pipeline (Terraform Deployment)
 
-The CD pipeline is **automatically triggered** after a successful CI run.
+Deploys infrastructure and application using Terraform.
 
-### What happens:
-- CI builds & pushes Docker image to ECR (tagged with commit SHA)
-- CD receives this image tag automatically
-- Terraform is executed using this image via: TF_VAR_app_image
+### Trigger
+- automatically after successful CI run  
+- optional manual trigger (`workflow_dispatch`) for redeploy / rollback
 
-  TF_VAR_app_image
-`Workflow:`
+### Image Flow
+- CI builds and pushes image → ECR (`GITHUB_SHA`)
+- CD automatically injects image into Terraform via `TF_VAR_app_image`
+
+### Pipeline Steps
 - terraform fmt
 - terraform validate
+- **Checkov (security scan)**
 - terraform plan
-- terraform apply
+- terraform apply (after approval)
 
 ### Required GitHub Settings
 
-CD deploys infrastructure manually via workflow_dispatch.
-
-Deployments to production require manual approval via GitHub Environments (required reviewers enabled).
-
-`Variables:`
+**Variables**
 - AWS_REGION
+- ECR_URL
 
-`Secrets:`
+**Secrets**
 - OIDC_ARN
 - DB_STRING
 - CLOUDFLARE_API_TOKEN
 - ZONE_ID_CLOUDFLARE
 
----
+### Manual Deployment / Rollback
 
-## 7. Deployment Flow
+You can also manually trigger the CD pipeline via:
+**GitHub Actions → Run workflow** (workflow_dispatch)
 
-```text
-GitHub Actions (CI)
-   ↓
-Docker Build → ECR (tagged with SHA)
-   ↓
-Terraform Apply (CD)
-   ↓
-ECS Fargate
-   ↓
-ALB
-   ↓
-Cloudflare DNS
-```
+This allows you to perform **rollbacks** using a previous image tag (Git SHA)
 
 ---
 
-## 8. Access
+## 7. Access
 
 ### After deployment:
 ```text
@@ -201,15 +191,6 @@ https://<subdomain>.<domain>
 ```text
 https://tm.nashar.dev
 ```
-
----
-
-### Manual Deployment / Rollback
-
-You can also manually trigger the CD pipeline via:
-**GitHub Actions → Run workflow** (workflow_dispatch)
-
-This allows you to perform **rollbacks** using a previous image tag (Git SHA)
 
 ---
 
@@ -246,17 +227,6 @@ Infrastructure can be destroyed using the destroy.yml GitHub Actions workflow:
 → Go to **Actions → "Destroy Terraform Infrastructure" → Run workflow**
 
 ### ⚠️
-
 - This will delete all infrastructure managed by the main Terraform stack (ECS, ALB, VPC, etc.)
 - Bootstrap resources (S3 state bucket, DynamoDB lock table, ECR repository, OIDC rules) are NOT deleted 
 - Container images stored in ECR are preserved
-- The workflow requires manual confirmation before execution
-
----
-
-## 11. Notes
-
-- Bootstrap is run only once
-- CI builds images automatically
-- CD deploys infrastructure manually (via workflow_dispatch)
-- Infrastructure and application are fully decoupled
