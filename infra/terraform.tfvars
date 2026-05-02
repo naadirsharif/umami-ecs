@@ -16,5 +16,3 @@ domain_name    = "nashar.dev"
 subdomain_name = "tm"
 
 acm_validation_method = "DNS"
-
-
